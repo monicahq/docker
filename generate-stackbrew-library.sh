@@ -45,7 +45,7 @@ getArches 'monica'
 # Header.
 cat <<-EOH
 # This file is generated via https://github.com/monicahq/docker/blob/$(fileCommit "$self")/$self
-Maintainers: Alexis Saettler <alexis@saettler.org>
+Maintainers: Alexis Saettler <alexis@saettler.org> (@asbiin)
 GitRepo: https://github.com/monicahq/docker.git
 EOH
 

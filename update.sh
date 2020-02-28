@@ -28,12 +28,12 @@ RUN set -eu; sed -ri -e \"s!/var/www/html!\\\${APACHE_DOCUMENT_ROOT}!g\" /etc/ap
 	[fpm-alpine]=''
 )
 
-label="LABEL maintainer=\"Alexis Saettler <alexis@saettler.org> (@asbiin)\" \\n\
-      org.label-schema.name=\"MonicaHQ, the Personal Relationship Manager\" \\n\
-      org.label-schema.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\n\
-      org.label-schema.url=\"https://monicahq.com\" \\n\
-      org.label-schema.vcs-url=\"https://github.com/monicahq/monica\" \\n\
-      org.label-schema.vendor=\"Monica\" \\n\
+label="LABEL maintainer=\"Alexis Saettler <alexis@saettler.org> (@asbiin)\" \\\\\\n\
+      org.label-schema.name=\"MonicaHQ, the Personal Relationship Manager\" \\\\\\n\
+      org.label-schema.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\\\\\n\
+      org.label-schema.url=\"https://monicahq.com\" \\\\\\n\
+      org.label-schema.vcs-url=\"https://github.com/monicahq/monica\" \\\\\\n\
+      org.label-schema.vendor=\"Monica\" \\\\\\n\
       org.label-schema.schema-version=\"1.0\""
 
 apcu_version="$(

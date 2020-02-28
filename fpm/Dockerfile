@@ -1,11 +1,11 @@
 FROM php:7.3-fpm
 
-LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" 
-      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" 
-      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." 
-      org.label-schema.url="https://monicahq.com" 
-      org.label-schema.vcs-url="https://github.com/monicahq/monica" 
-      org.label-schema.vendor="Monica" 
+LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
+      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" \
+      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
+      org.label-schema.url="https://monicahq.com" \
+      org.label-schema.vcs-url="https://github.com/monicahq/monica" \
+      org.label-schema.vendor="Monica" \
       org.label-schema.schema-version="1.0"
 
 # entrypoint.sh dependencies

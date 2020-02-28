@@ -57,7 +57,7 @@ join() {
 }
 
 SEARCHFOR="Upgrade available - the latest version is "
-latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name')"
+latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
 
 variants=( */ )
 variants=( "${variants[@]%/}" )

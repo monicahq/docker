@@ -1,0 +1,30 @@
+name: Monica's docker
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        variant: [apache, fpm, fpm-alpine]
+        arch: [amd64]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: 'docker-library/official-images'
+        path: 'official-images'
+
+    - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
+      run: |
+        docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
+        docker images
+
+
+    - name: Test image ${{ matrix.variant }} ${{ matrix.arch }}
+      run: |
+        official-images/test/run.sh monica:${{ matrix.variant }}

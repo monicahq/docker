@@ -1,11 +1,11 @@
 FROM php:7.3-fpm-alpine
 
-LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
-      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" \
-      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
-      org.label-schema.url="https://monicahq.com" \
-      org.label-schema.vcs-url="https://github.com/monicahq/monica" \
-      org.label-schema.vendor="Monica" \
+LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" 
+      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" 
+      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." 
+      org.label-schema.url="https://monicahq.com" 
+      org.label-schema.vcs-url="https://github.com/monicahq/monica" 
+      org.label-schema.vendor="Monica" 
       org.label-schema.schema-version="1.0"
 
 # entrypoint.sh dependencies
@@ -15,7 +15,8 @@ RUN set -ex; \
 		bash \
 		coreutils \
 		rsync \
-	;
+	; \
+    rm -rf /var/cache/apk/*
 
 # Install required PHP extensions
 RUN set -ex; \
@@ -76,7 +77,8 @@ RUN set -ex; \
 		| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 		)"; \
 	apk add --virtual .monica-phpext-rundeps $runDeps; \
-	apk del .build-deps
+	apk del .build-deps; \
+    rm -rf /var/cache/apk/*
 
 # Set crontab for schedules
 RUN set -ex; \
@@ -113,7 +115,7 @@ VOLUME /var/www/html
 
 # Define Monica version and expected SHA512 signature
 ENV MONICA_VERSION v2.16.0
-ENV MONICA_SHA512 f2d1a434b5615bcd100388066854dfd36c81f403e817f45a21d4c04ec9ee022339c25334913586a51e763928d17d8b3fa79b6bf1883cac6fffe1aabfbd14ae3c
+ENV MONICA_SHA512 
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \
@@ -130,7 +132,8 @@ RUN set -ex; \
 	cp /usr/src/monica/.env.example /usr/src/monica/.env; \
 	chown -R www-data:www-data /usr/src/monica; \
     \
-	apk del .fetch-deps
+	apk del .fetch-deps; \
+    rm -rf /var/cache/apk/*
 
 COPY upgrade.exclude \
     /usr/local/share/

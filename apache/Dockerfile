@@ -1,17 +1,18 @@
 FROM php:7.3-apache
 
-LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
-      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" \
-      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
-      org.label-schema.url="https://monicahq.com" \
-      org.label-schema.vcs-url="https://github.com/monicahq/monica" \
-      org.label-schema.vendor="Monica" \
+LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" 
+      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" 
+      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." 
+      org.label-schema.url="https://monicahq.com" 
+      org.label-schema.vcs-url="https://github.com/monicahq/monica" 
+      org.label-schema.vendor="Monica" 
       org.label-schema.schema-version="1.0"
 
 # entrypoint.sh dependencies
 RUN set -ex; \
     \
     apt-get update; \
+    apt-get -y autoremove; \
     apt-get install -y --no-install-recommends \
         rsync \
         bash \
@@ -82,7 +83,7 @@ RUN set -ex; \
 		| xargs -rt apt-mark manual; \
 		\
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
+    rm -rf /var/lib/apt/lists/*; \
 	\
 	if command -v a2enmod; then \
 		a2enmod rewrite; \
@@ -123,7 +124,7 @@ VOLUME /var/www/html
 
 # Define Monica version and expected SHA512 signature
 ENV MONICA_VERSION v2.16.0
-ENV MONICA_SHA512 f2d1a434b5615bcd100388066854dfd36c81f403e817f45a21d4c04ec9ee022339c25334913586a51e763928d17d8b3fa79b6bf1883cac6fffe1aabfbd14ae3c
+ENV MONICA_SHA512 
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN set -eu; sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf; \

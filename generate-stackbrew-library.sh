@@ -31,7 +31,7 @@ getArches() {
 	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
 
 	eval "declare -g -A parentRepoToArches=( $(
-		find -name 'Dockerfile' -exec awk '
+		find -maxdepth 3 -name 'Dockerfile' -exec awk '
 				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|microsoft\/[^:]+)(:|$)/ {
 					print "'"$officialImagesUrl"'" $2
 				}
@@ -40,7 +40,7 @@ getArches() {
 			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
 	) )"
 }
-getArches 'postfixadmin'
+getArches 'monica'
 
 # Header.
 cat <<-EOH
@@ -64,7 +64,7 @@ variants=( "${variants[@]%/}" )
 
 for variant in "${variants[@]}"; do
 	commit="$(dockerfileCommit "$variant")"
-	fullversion="$(git show "$commit":"$variant/Dockerfile" | grep -iF "ARG MONICA_VERSION" | sed -E "s@ARG MONICA_VERSION=([0-9.]+)@\1@")"
+	fullversion="$(git show "$commit":"$variant/Dockerfile" | grep -iF "ENV MONICA_VERSION" | sed -E "s@ENV MONICA_VERSION v([0-9.]+)@\1@")"
 
 	versionAliases=( "$fullversion" "${fullversion%.*}" "${fullversion%.*.*}" )
 	if [ "$fullversion" = "$latest" ]; then

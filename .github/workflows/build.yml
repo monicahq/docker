@@ -20,7 +20,7 @@ jobs:
         path: 'official-images'
 
     - name: Fix image
-      if: ${{ matrix.arch }} == "i386"
+      if: matrix.arch == "i386"
       run: |
         sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
 
@@ -43,6 +43,11 @@ jobs:
         ./update.sh
         bash -c "[[ $hash_before = $(git add -A && git write-tree) ]]"
 
+    - name: Install bashbrew
+      run: |
+        curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+        chmod +x "bashbrew"
+        echo "::add-path::$(pwd)"
     - name: Run stackbrew
       run: |
         ./generate-stackbrew-library.sh

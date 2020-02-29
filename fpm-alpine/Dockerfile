@@ -15,7 +15,8 @@ RUN set -ex; \
 		bash \
 		coreutils \
 		rsync \
-	;
+	; \
+    rm -rf /var/cache/apk/*
 
 # Install required PHP extensions
 RUN set -ex; \
@@ -76,7 +77,8 @@ RUN set -ex; \
 		| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 		)"; \
 	apk add --virtual .monica-phpext-rundeps $runDeps; \
-	apk del .build-deps
+	apk del .build-deps; \
+    rm -rf /var/cache/apk/*
 
 # Set crontab for schedules
 RUN set -ex; \
@@ -130,7 +132,8 @@ RUN set -ex; \
 	cp /usr/src/monica/.env.example /usr/src/monica/.env; \
 	chown -R www-data:www-data /usr/src/monica; \
     \
-	apk del .fetch-deps
+	apk del .fetch-deps; \
+    rm -rf /var/cache/apk/*
 
 COPY upgrade.exclude \
     /usr/local/share/

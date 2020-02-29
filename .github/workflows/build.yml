@@ -1,0 +1,53 @@
+name: Monica's docker
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        variant: [apache, fpm, fpm-alpine]
+        arch: [amd64, i386]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: 'docker-library/official-images'
+        path: 'official-images'
+
+    - name: Fix image
+      if: matrix.arch == 'i386'
+      run: |
+        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
+
+    - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
+      run: |
+        docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
+        docker images
+
+    - name: Test image ${{ matrix.variant }} ${{ matrix.arch }}
+      run: |
+        official-images/test/run.sh monica:${{ matrix.variant }}
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Test update script
+      run: |
+        hash_before=$(git write-tree)
+        ./update.sh
+        bash -c "[[ $hash_before = $(git add -A && git write-tree) ]]"
+
+    - name: Install bashbrew
+      run: |
+        curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+        chmod +x "bashbrew"
+        echo "::add-path::$(pwd)"
+    - name: Run stackbrew
+      run: |
+        ./generate-stackbrew-library.sh

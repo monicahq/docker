@@ -12,6 +12,7 @@ LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
 RUN set -ex; \
     \
     apt-get update; \
+    apt-get -y autoremove; \
     apt-get install -y --no-install-recommends \
         rsync \
         bash \
@@ -82,7 +83,7 @@ RUN set -ex; \
 		| xargs -rt apt-mark manual; \
 		\
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
+    rm -rf /var/lib/apt/lists/*; \
 	\
 	if command -v a2enmod; then \
 		a2enmod rewrite; \

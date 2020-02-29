@@ -28,6 +28,14 @@ RUN set -eu; sed -ri -e \"s!/var/www/html!\\\${APACHE_DOCUMENT_ROOT}!g\" /etc/ap
 	[fpm-alpine]=''
 )
 
+label="LABEL maintainer=\"Alexis Saettler <alexis@saettler.org> (@asbiin)\" \\\\\\n\
+      org.label-schema.name=\"MonicaHQ, the Personal Relationship Manager\" \\\\\\n\
+      org.label-schema.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\\\\\n\
+      org.label-schema.url=\"https://monicahq.com\" \\\\\\n\
+      org.label-schema.vcs-url=\"https://github.com/monicahq/monica\" \\\\\\n\
+      org.label-schema.vendor=\"Monica\" \\\\\\n\
+      org.label-schema.schema-version=\"1.0\""
+
 apcu_version="$(
 	git ls-remote --tags https://github.com/krakjoe/apcu.git \
 		| cut -d/ -f3 \
@@ -78,6 +86,7 @@ for variant in apache fpm fpm-alpine; do
 		s/%%VERSION%%/'"$version"'/;
 		s/%%SHA512%%/'"$sha512"'/;
 		s/%%CMD%%/'"${cmd[$variant]}"'/;
+		s#%%LABEL%%#'"$label"'#;
 		s#%%APACHE_DOCUMENT%%#'"${document[$variant]}"'#;
 		s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;
 		s/%%MEMCACHED_VERSION%%/'"${pecl_versions[memcached]}"'/;

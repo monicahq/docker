@@ -20,7 +20,7 @@ jobs:
         path: 'official-images'
 
     - name: Fix image
-      if: matrix.arch == "i386"
+      if: matrix.arch == 'i386'
       run: |
         sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
 

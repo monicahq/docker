@@ -10,7 +10,7 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest]
         variant: [apache, fpm, fpm-alpine]
-        arch: [amd64]
+        arch: [amd64, i386]
 
     steps:
     - uses: actions/checkout@v2
@@ -19,12 +19,29 @@ jobs:
         repository: 'docker-library/official-images'
         path: 'official-images'
 
+    - name: Fix image
+      if: ${{ matrix.arch }} == "i386"
+      run: |
+        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
+
     - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
       run: |
         docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
         docker images
 
-
     - name: Test image ${{ matrix.variant }} ${{ matrix.arch }}
       run: |
         official-images/test/run.sh monica:${{ matrix.variant }}
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Test update script
+      run: |
+        hash_before=$(git write-tree)
+        ./update.sh
+        bash -c "[[ $hash_before = $(git add -A && git write-tree) ]]"
+
+    - name: Run stackbrew
+      run: |
+        ./generate-stackbrew-library.sh

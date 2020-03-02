@@ -29,12 +29,14 @@ RUN set -eu; sed -ri -e \"s!/var/www/html!\\\${APACHE_DOCUMENT_ROOT}!g\" /etc/ap
 )
 
 label="LABEL maintainer=\"Alexis Saettler <alexis@saettler.org> (@asbiin)\" \\\\\\n\
-      org.label-schema.name=\"MonicaHQ, the Personal Relationship Manager\" \\\\\\n\
-      org.label-schema.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\\\\\n\
-      org.label-schema.url=\"https://monicahq.com\" \\\\\\n\
-      org.label-schema.vcs-url=\"https://github.com/monicahq/monica\" \\\\\\n\
-      org.label-schema.vendor=\"Monica\" \\\\\\n\
-      org.label-schema.schema-version=\"1.0\""
+	  org.opencontainers.image.authors=\"Alexis Saettler <alexis@saettler.org>\" \\\\\\n\
+      org.opencontainers.image.title=\"MonicaHQ, the Personal Relationship Manager\" \\\\\\n\
+      org.opencontainers.image.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\\\\\n\
+      org.opencontainers.image.url=\"https://monicahq.com\" \\\\\\n\
+	  org.opencontainers.image.revision=\"%%COMMIT%%\" \\\\\\n\
+      org.opencontainers.image.source=\"https://github.com/monicahq/docker\" \\\\\\n\
+      org.opencontainers.image.vendor=\"Monica\" \\\\\\n\
+      org.opencontainers.image.version=\"%%VERSION%%\""
 
 apcu_version="$(
 	git ls-remote --tags https://github.com/krakjoe/apcu.git \
@@ -70,6 +72,7 @@ declare -A pecl_versions=(
 )
 
 version="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name')"
+commit="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
 sha512="$(curl -fsSL "https://github.com/monicahq/monica/releases/download/$version/monica-$version.sha512" | grep monica-$version.tar.bz2 | awk '{ print $1 }')"
 
 set -x
@@ -83,10 +86,11 @@ for variant in apache fpm fpm-alpine; do
 	sed -e '
 		s/%%VARIANT%%/'"$variant"'/;
 		s/%%PHP_VERSION%%/'"$phpVersion"'/;
+		s#%%LABEL%%#'"$label"'#;
 		s/%%VERSION%%/'"$version"'/;
+		s/%%COMMIT%%/'"$commit"'/;
 		s/%%SHA512%%/'"$sha512"'/;
 		s/%%CMD%%/'"${cmd[$variant]}"'/;
-		s#%%LABEL%%#'"$label"'#;
 		s#%%APACHE_DOCUMENT%%#'"${document[$variant]}"'#;
 		s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;
 		s/%%MEMCACHED_VERSION%%/'"${pecl_versions[memcached]}"'/;

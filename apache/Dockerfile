@@ -1,12 +1,15 @@
 FROM php:7.3-apache
 
+# opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
-      org.label-schema.name="MonicaHQ, the Personal Relationship Manager" \
-      org.label-schema.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
-      org.label-schema.url="https://monicahq.com" \
-      org.label-schema.vcs-url="https://github.com/monicahq/monica" \
-      org.label-schema.vendor="Monica" \
-      org.label-schema.schema-version="1.0"
+	  org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
+      org.opencontainers.image.title="MonicaHQ, the Personal Relationship Manager" \
+      org.opencontainers.image.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
+      org.opencontainers.image.url="https://monicahq.com" \
+	  org.opencontainers.image.revision="e3c79ada95ba6b34281628ee044a7bf0e9920f26" \
+      org.opencontainers.image.source="https://github.com/monicahq/docker" \
+      org.opencontainers.image.vendor="Monica" \
+      org.opencontainers.image.version="v2.16.0"
 
 # entrypoint.sh dependencies
 RUN set -ex; \
@@ -63,7 +66,7 @@ RUN set -ex; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.18; \
     pecl install memcached-3.1.5; \
-    pecl install redis-5.1.1; \
+    pecl install redis-5.2.0; \
     \
     docker-php-ext-enable \
         apcu \

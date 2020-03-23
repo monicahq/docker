@@ -6,10 +6,10 @@ LABEL maintainer="Alexis Saettler <alexis@saettler.org> (@asbiin)" \
       org.opencontainers.image.title="MonicaHQ, the Personal Relationship Manager" \
       org.opencontainers.image.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
       org.opencontainers.image.url="https://monicahq.com" \
-	  org.opencontainers.image.revision="e3c79ada95ba6b34281628ee044a7bf0e9920f26" \
+	  org.opencontainers.image.revision="3a1243d3195668171b8d096c0f903c08513336d9" \
       org.opencontainers.image.source="https://github.com/monicahq/docker" \
       org.opencontainers.image.vendor="Monica" \
-      org.opencontainers.image.version="v2.16.0"
+      org.opencontainers.image.version="v2.17.0"
 
 # entrypoint.sh dependencies
 RUN set -ex; \
@@ -66,7 +66,7 @@ RUN set -ex; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.18; \
     pecl install memcached-3.1.5; \
-    pecl install redis-5.2.0; \
+    pecl install redis-5.2.1; \
     \
     docker-php-ext-enable \
         apcu \
@@ -131,8 +131,8 @@ RUN if [ $(uname -m) = "x86_64" ]; then \
 VOLUME /var/www/html
 
 # Define Monica version and expected SHA512 signature
-ENV MONICA_VERSION v2.16.0
-ENV MONICA_SHA512 f2d1a434b5615bcd100388066854dfd36c81f403e817f45a21d4c04ec9ee022339c25334913586a51e763928d17d8b3fa79b6bf1883cac6fffe1aabfbd14ae3c
+ENV MONICA_VERSION v2.17.0
+ENV MONICA_SHA512 9e208f3aee15eb8ffcd33aa834fc2a4c07ef3396234132d76e2563e0c17c596e5f505aa6527625b13be1f564f8583c4bbd2a54c44d26f8e9c8418d9636c8720b
 ENV MONICA_SRC /usr/src/monica
 
 

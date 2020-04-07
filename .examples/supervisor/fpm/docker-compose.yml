@@ -35,8 +35,5 @@ services:
 
 volumes:
   data:
-    name: data
   www:
-    name: www
   mysql:
-    name: mysql

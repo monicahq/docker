@@ -115,13 +115,9 @@ services:
 
 volumes:
   data:
-    name: data
   www:
-    name: www
   db:
-    name: db
   certs:
-    name: certs
 
 networks:
   proxy-tier:

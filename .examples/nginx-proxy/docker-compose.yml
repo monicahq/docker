@@ -117,17 +117,11 @@ services:
 
 volumes:
   data:
-    name: data
   www:
-    name: www
   mysql:
-    name: mysql
   certs:
-    name: certs
   vhost.d:
-    name: vhost.d
   html:
-    name: html
 
 networks:
   proxy-tier:

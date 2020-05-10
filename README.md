@@ -73,12 +73,13 @@ See some examples of docker-compose possibilities in the [example section](/.exa
 
 This version will use the apache image and add a mysql container. The volumes are set to keep your data persistent. This setup provides **no ssl encryption** and is intended to run behind a proxy.
 
-Make sure to pass in values for `APP_KEY` and `MYSQL_ROOT_PASSWORD` variables before you run this setup.
+Make sure to pass in values for `APP_KEY` variable before you run this setup.
 
 Set `APP_KEY` to a random 32-character string. For example, if you
 have the `pwgen` utility installed, you could copy and paste the
 output of `pwgen -s 32 1`.
 
+1. Create a `docker-compose.yml` file
 
 ```yaml
 version: "3.4"
@@ -87,20 +88,20 @@ services:
   app:
     image: monica
     depends_on:
-      - mysql
+      - db
     ports:
       - 8080:80
     environment:
       - APP_KEY=
-      - DB_HOST=mysql
+      - DB_HOST=db
     volumes:
       - data:/var/www/html/storage
     restart: always
 
-  mysql:
+  db:
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
       - MYSQL_USER=homestead
       - MYSQL_PASSWORD=secret
@@ -115,14 +116,25 @@ volumes:
     name: mysql
 ```
 
-Run `docker-compose up -d`.
+2. Set a value for `APP_KEY` variable before you run this setup.
+   It should be a random 32-character string. For example, if you have the `pwgen` utility installed,
+   you can copy and paste the output of
+   ```sh
+   pwgen -s 32 1
+   ```
 
-Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system. If this looks ok, add your first user account.
+3. Run
+   ```sh
+   docker-compose up -d
+   ```
 
-Then run this command once:
-```sh
-docker-compose exec app php artisan setup:production
-```
+   Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system.
+   If this looks ok, add your first user account.
+
+4. Run this command once:
+   ```sh
+   docker-compose exec app php artisan setup:production
+   ```
 
 ### FPM version
 
@@ -130,14 +142,12 @@ When using FPM image, you will need another container with a webserver to proxy 
 
 The webserver will need an access to all static files from Monica container, the volumes `html` will deal with it.
 
-An example of `nginx.conf` file can be found on the [`example section`](/.examples/supervisor/fpm/web/nginx.conf).
+1. Download `nginx.conf` file. An example can be found on the [`example section`](/scripts/docker/.examples/supervisor/fpm/web/nginx.conf)
+   ```sh
+   curl -sSL https://raw.githubusercontent.com/monicahq/monica/master/scripts/docker/.examples/supervisor/fpm/web/nginx.conf -o nginx.conf
+   ```
 
-Make sure to set values for `APP_KEY` and `MYSQL_ROOT_PASSWORD` variables before you run this setup.
-
-Set `APP_KEY` to a random 32-character string. For example, if you
-have the `pwgen` utility installed, you could copy and paste the
-output of `pwgen -s 32 1`.
-
+2. Create a `docker-compose.yml` file
 
 ```yaml
 version: "3.4"
@@ -146,10 +156,10 @@ services:
   app:
     image: monica:fpm
     depends_on:
-      - mysql
+      - db
     environment:
       - APP_KEY=
-      - DB_HOST=mysql
+      - DB_HOST=db
     volumes:
       - html:/var/www/html
       - data:/var/www/html/storage
@@ -167,10 +177,10 @@ services:
       - data:/var/www/html/storage:ro
     restart: always
 
-  mysql:
+  db:
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
       - MYSQL_USER=homestead
       - MYSQL_PASSWORD=secret
@@ -187,19 +197,29 @@ volumes:
     name: mysql
 ```
 
-Run `docker-compose up -d`.
+3. Set a value for `APP_KEY` variable before you run this setup.
+   It should be a random 32-character string. For example, if you have the `pwgen` utility installed,
+   you can copy and paste the output of
+   ```sh
+   pwgen -s 32 1
+   ```
 
-Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system. If this looks ok, add your first user account.
+4. Run
+   ```sh
+   docker-compose up -d
+   ```
 
-Then run this command once:
-```sh
-docker-compose exec app php artisan setup:production
-```
+   Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system.
+   If this looks ok, add your first user account.
 
+5. Run this command once:
+   ```sh
+   docker-compose exec app php artisan setup:production
+   ```
 
 ## Make Monica available from the internet 
 
-To expose your Monica instance for the internet, it's important to set `APP_ENV=production` in your `.env` file. In this case `https` mode will be mandatory.
+To expose your Monica instance for the internet, it's important to set `APP_ENV=production` in your `.env` file or environment variables. In this case `https` scheme will be **mandatory**.
 
 ### Using a proxy webserver on the host
 

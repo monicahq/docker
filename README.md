@@ -142,9 +142,9 @@ When using FPM image, you will need another container with a webserver to proxy 
 
 The webserver will need an access to all static files from Monica container, the volumes `html` will deal with it.
 
-1. Download `nginx.conf` file. An example can be found on the [`example section`](/scripts/docker/.examples/supervisor/fpm/web/nginx.conf)
+1. Download `nginx.conf` file. An example can be found on the [`example section`](/.examples/nginx-proxy/web/nginx.conf)
    ```sh
-   curl -sSL https://raw.githubusercontent.com/monicahq/monica/master/scripts/docker/.examples/supervisor/fpm/web/nginx.conf -o nginx.conf
+   curl -sSL https://raw.githubusercontent.com/monicahq/docker/master/.examples/nginx-proxy/web/nginx.conf -o nginx.conf
    ```
 
 2. Create a `docker-compose.yml` file

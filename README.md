@@ -142,10 +142,13 @@ When using FPM image, you will need another container with a webserver to proxy 
 
 The webserver will need an access to all static files from Monica container, the volumes `html` will deal with it.
 
-1. Download `nginx.conf` file. An example can be found on the [`example section`](/.examples/nginx-proxy/web/nginx.conf)
+1. Download `nginx.conf` and `Dockerfile` file for nginx image. An example can be found on the [`example section`](/.examples/nginx-proxy/web/)
    ```sh
-   curl -sSL https://raw.githubusercontent.com/monicahq/docker/master/.examples/nginx-proxy/web/nginx.conf -o nginx.conf
+   mkdir web
+   curl -sSL https://raw.githubusercontent.com/monicahq/docker/master/.examples/nginx-proxy/web/nginx.conf -o web/nginx.conf
+   curl -sSL https://raw.githubusercontent.com/monicahq/docker/master/.examples/nginx-proxy/web/Dockerfile -o web/Dockerfile
    ```
+The `web` container image should be pre-build before each deploy with: `docker-compose build`
 
 2. Create a `docker-compose.yml` file
 
@@ -161,19 +164,16 @@ services:
       - APP_KEY=
       - DB_HOST=db
     volumes:
-      - html:/var/www/html
       - data:/var/www/html/storage
     restart: always
   
   web:
-    image: nginx
+    build: ./web
     ports:
       - 8080:80
     depends_on:
       - app
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - html:/var/www/html:ro
       - data:/var/www/html/storage:ro
     restart: always
 
@@ -191,8 +191,6 @@ services:
 volumes:
   data:
     name: data
-  html:
-    name: html
   mysql:
     name: mysql
 ```

@@ -28,8 +28,7 @@ RUN set -eu; sed -ri -e \"s!/var/www/html!\\\${APACHE_DOCUMENT_ROOT}!g\" /etc/ap
 	[fpm-alpine]=''
 )
 
-label="LABEL maintainer=\"Alexis Saettler <alexis@saettler.org> (@asbiin)\" \\\\\\n\
-	  org.opencontainers.image.authors=\"Alexis Saettler <alexis@saettler.org>\" \\\\\\n\
+label="LABEL org.opencontainers.image.authors=\"Alexis Saettler <alexis@saettler.org>\" \\\\\\n\
       org.opencontainers.image.title=\"MonicaHQ, the Personal Relationship Manager\" \\\\\\n\
       org.opencontainers.image.description=\"This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you.\" \\\\\\n\
       org.opencontainers.image.url=\"https://monicahq.com\" \\\\\\n\
@@ -101,6 +100,4 @@ for variant in apache fpm fpm-alpine; do
 	for file in entrypoint cron queue; do
 		cp docker-$file.sh $variant/$file.sh
 	done
-	
-	cp upgrade.exclude $variant/
 done

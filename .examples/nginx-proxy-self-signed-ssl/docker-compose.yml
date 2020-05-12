@@ -26,7 +26,6 @@ services:
     env_file: .env
     volumes:
       - data:/var/www/html/storage
-      - www:/var/www/html
     restart: always
     depends_on:
       - db
@@ -53,7 +52,6 @@ services:
     restart: always
     volumes:
       - data:/var/www/html/storage
-      - www:/var/www/html:ro
     command: cron.sh
     depends_on:
       - db
@@ -65,7 +63,6 @@ services:
     restart: always
     volumes:
       - data:/var/www/html/storage
-      - www:/var/www/html:ro
     command: queue.sh
     depends_on:
       - db
@@ -78,7 +75,6 @@ services:
       - VIRTUAL_HOST=monica.local
     volumes:
       - data:/var/www/html/storage:ro
-      - www:/var/www/html:ro
     depends_on:
       - app
     networks:
@@ -115,7 +111,6 @@ services:
 
 volumes:
   data:
-  www:
   db:
   certs:
 

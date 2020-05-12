@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# return true if specified directory is empty
-directory_empty() {
-    [ -z "$(ls -A "$1/")" ]
-}
+set -Eeuo pipefail
 
 # wait for the database to start
 waitfordb() {
@@ -31,25 +28,8 @@ waitfordb() {
 
 if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ]; then
 
-    MONICASRC=/usr/src/monica
     MONICADIR=/var/www/html
     ARTISAN="php ${MONICADIR}/artisan"
-
-    # Update application sources
-    echo "Syncing sources..."
-    if [ "$(id -u)" = 0 ]; then
-        rsync_options="-rlDog --chown www-data:www-data"
-    else
-        rsync_options="-rlD"
-    fi
-    rsync $rsync_options --delete --exclude-from=/usr/local/share/upgrade.exclude $MONICASRC/ $MONICADIR/
-
-    for dir in storage; do
-        if [ ! -d "$MONICADIR/$dir" ] || directory_empty "$MONICADIR/$dir"; then
-            rsync $rsync_options --include "/$dir/" --exclude '/*' $MONICASRC/ $MONICADIR/
-        fi
-    done
-    echo "...done!"
 
     # Ensure storage directories are present
     STORAGE=${MONICADIR}/storage
@@ -86,4 +66,4 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ]; then
 
 fi
 
-exec $@
+exec "$@"

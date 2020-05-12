@@ -10,4 +10,4 @@ RUN set -ex; \
     rm -rf /var/lib/apt/lists/*
 
 COPY supervisord.conf /etc/supervisord.conf
-CMD ["supervisord", "-c /etc/supervisord.conf"]
+CMD ["supervisord", "-c", "/etc/supervisord.conf"]

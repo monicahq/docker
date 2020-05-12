@@ -10,7 +10,6 @@ services:
       - 80:80
     volumes:
       - data:/var/www/html/storage
-      - www:/var/www/html
     restart: always
 
   db:
@@ -26,5 +25,4 @@ services:
 
 volumes:
   data:
-  www:
   mysql:

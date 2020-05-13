@@ -38,8 +38,8 @@ jobs:
       if: matrix.arch != 'i386'
       run: |
         echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-        docker tag monica:${{ matrix.variant }} docker.pkg.github.com/monicahq/docker/monica:${{ matrix.variant }}
-        docker push docker.pkg.github.com/monicahq/docker/monica:${{ matrix.variant }}
+        docker tag monica:${{ matrix.variant }} docker.pkg.github.com/monicahq/docker/monicadev:${{ matrix.variant }}
+        docker push docker.pkg.github.com/monicahq/docker/monicadev:${{ matrix.variant }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

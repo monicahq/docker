@@ -34,8 +34,7 @@ jobs:
         official-images/test/run.sh monica:${{ matrix.variant }}
 
     - name: Publish package
-      #if: github.ref == 'master' && matrix.arch != 'i386'
-      if: matrix.arch != 'i386'
+      if: github.ref == 'master' && matrix.arch != 'i386'
       run: |
         echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
         docker tag monica:${{ matrix.variant }} docker.pkg.github.com/monicahq/docker/monicadev:${{ matrix.variant }}

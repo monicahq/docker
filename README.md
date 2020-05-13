@@ -140,8 +140,6 @@ volumes:
 
 When using FPM image, you will need another container with a webserver to proxy http requests. In this example we use nginx with a basic container to do this.
 
-The webserver will need an access to all static files from Monica container, the volumes `html` will deal with it.
-
 1. Download `nginx.conf` and `Dockerfile` file for nginx image. An example can be found on the [`example section`](/.examples/nginx-proxy/web/)
    ```sh
    mkdir web

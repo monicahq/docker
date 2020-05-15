@@ -72,7 +72,6 @@ declare -A pecl_versions=(
 
 version="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name')"
 commit="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
-sha512="$(curl -fsSL "https://github.com/monicahq/monica/releases/download/$version/monica-$version.sha512" | grep monica-$version.tar.bz2 | awk '{ print $1 }')"
 
 set -x
 
@@ -88,7 +87,6 @@ for variant in apache fpm fpm-alpine; do
 		s#%%LABEL%%#'"$label"'#;
 		s/%%VERSION%%/'"$version"'/;
 		s/%%COMMIT%%/'"$commit"'/;
-		s/%%SHA512%%/'"$sha512"'/;
 		s/%%CMD%%/'"${cmd[$variant]}"'/;
 		s#%%APACHE_DOCUMENT%%#'"${document[$variant]}"'#;
 		s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;

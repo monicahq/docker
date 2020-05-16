@@ -81,7 +81,8 @@ RUN set -ex; \
 # Set crontab for schedules
 RUN set -ex; \
     \
-    rm /var/spool/cron/crontabs/root; \
+    mkdir -p /var/spool/cron/crontabs; \
+    rm -f /var/spool/cron/crontabs/root; \
     echo '*/5 * * * * php /var/www/html/artisan schedule:run -v > /proc/1/fd/1 2> /proc/1/fd/2' > /var/spool/cron/crontabs/www-data
 
 # Opcache
@@ -106,6 +107,7 @@ RUN set -ex; \
     echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
     \
     echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+
 
 
 WORKDIR /var/www/html

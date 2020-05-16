@@ -1,0 +1,20 @@
+    for ext in tar.bz2 tar.bz2.asc; do \
+        curl -fsSL -o monica-${MONICA_VERSION}.$ext "https://github.com/monicahq/monica/releases/download/${MONICA_VERSION}/monica-${MONICA_VERSION}.$ext"; \
+    done; \
+    \
+    GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
+    export GNUPGHOME="$(mktemp -d)"; \
+    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
+        || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
+        || gpg --batch --keyserver keys.gnupg.net --recv-keys "$GPGKEY" \
+        || gpg --batch --keyserver pgp.mit.edu --recv-keys "$GPGKEY" \
+        || gpg --batch --keyserver keyserver.pgp.com --recv-keys "$GPGKEY"; \
+    gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
+    \
+    tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \
+    \
+    gpgconf --kill all; \
+    rm -r "$GNUPGHOME" monica-${MONICA_VERSION}.tar.bz2 monica-${MONICA_VERSION}.tar.bz2.asc; \
+    \
+    cp /var/www/html/.env.example /var/www/html/.env; \
+    chown -R www-data:www-data /var/www/html;

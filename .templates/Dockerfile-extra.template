@@ -1,0 +1,36 @@
+# Set crontab for schedules
+RUN set -ex; \
+    \
+    mkdir -p /var/spool/cron/crontabs; \
+    rm -f /var/spool/cron/crontabs/root; \
+    echo '*/5 * * * * php /var/www/html/artisan schedule:run -v > /proc/1/fd/1 2> /proc/1/fd/2' > /var/spool/cron/crontabs/www-data
+
+# Opcache
+ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
+    PHP_OPCACHE_MAX_ACCELERATED_FILES="20000" \
+    PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+RUN set -ex; \
+    \
+    { \
+        echo '[opcache]'; \
+        echo 'opcache.enable=1'; \
+        echo 'opcache.revalidate_freq=0'; \
+        echo 'opcache.validate_timestamps=${PHP_OPCACHE_VALIDATE_TIMESTAMPS}'; \
+        echo 'opcache.max_accelerated_files=${PHP_OPCACHE_MAX_ACCELERATED_FILES}'; \
+        echo 'opcache.memory_consumption=${PHP_OPCACHE_MEMORY_CONSUMPTION}'; \
+        echo 'opcache.max_wasted_percentage=${PHP_OPCACHE_MAX_WASTED_PERCENTAGE}'; \
+        echo 'opcache.interned_strings_buffer=16'; \
+        echo 'opcache.fast_shutdown=1'; \
+    } > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
+    \
+    echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
+    \
+    echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+
+%%APACHE_DOCUMENT%%
+
+WORKDIR /var/www/html
+
+# Define Monica version
+ENV MONICA_VERSION %%VERSION%%

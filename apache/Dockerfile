@@ -89,10 +89,12 @@ RUN set -ex; \
         a2enmod rewrite; \
     fi
 
+
 # Set crontab for schedules
 RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
+    rm -f /var/spool/cron/crontabs/root; \
     echo '*/5 * * * * php /var/www/html/artisan schedule:run -v > /proc/1/fd/1 2> /proc/1/fd/2' > /var/spool/cron/crontabs/www-data
 
 # Opcache
@@ -118,15 +120,16 @@ RUN set -ex; \
     \
     echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
 
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN set -ex; \
+    \
+    sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf; \
+	sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 WORKDIR /var/www/html
 
 # Define Monica version
 ENV MONICA_VERSION v2.17.0
-
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN set -eu; sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf; \
-	sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 RUN set -ex; \
     fetchDeps=" \

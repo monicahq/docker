@@ -89,10 +89,12 @@ RUN set -ex; \
         a2enmod rewrite; \
     fi
 
+
 # Set crontab for schedules
 RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
+    rm -f /var/spool/cron/crontabs/root; \
     echo '*/5 * * * * php /var/www/html/artisan schedule:run -v > /proc/1/fd/1 2> /proc/1/fd/2' > /var/spool/cron/crontabs/www-data
 
 # Opcache
@@ -119,12 +121,11 @@ RUN set -ex; \
     echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
 
 
+
 WORKDIR /var/www/html
 
 # Define Monica version
 ENV MONICA_VERSION v2.17.0
-
-
 
 RUN set -ex; \
     fetchDeps=" \

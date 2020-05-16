@@ -8,24 +8,22 @@ services:
     env_file: .env
     volumes:
       - data:/var/www/html/storage
-      - www:/var/www/html
     restart: always
 
   web:
     build: ./web
     restart: always
     ports:
-      - 80:80
+      - 8880:80
     volumes:
       - data:/var/www/html/storage:ro
-      - www:/var/www/html:ro
     depends_on:
       - app
 
   db:
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=sekret_root_password
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
       - MYSQL_USER=homestead
       - MYSQL_PASSWORD=secret
@@ -35,5 +33,4 @@ services:
 
 volumes:
   data:
-  www:
   mysql:

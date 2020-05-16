@@ -15,8 +15,7 @@ RUN set -ex; \
     \
     apk add --no-cache \
         bash \
-        coreutils \
-        rsync
+        coreutils
 
 # Install required PHP extensions
 RUN set -ex; \

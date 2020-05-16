@@ -32,6 +32,8 @@ declare -A document=(
 
 label=$(_template .templates/Dockerfile-label.template)
 
+echo Initialisation
+
 apcu_version="$(
     git ls-remote --tags https://github.com/krakjoe/apcu.git \
         | cut -d/ -f3 \
@@ -40,6 +42,7 @@ apcu_version="$(
         | sort -V \
         | tail -1
 )"
+echo "  APCu version: $apcu_version"
 
 memcached_version="$(
     git ls-remote --tags https://github.com/php-memcached-dev/php-memcached.git \
@@ -49,6 +52,7 @@ memcached_version="$(
         | sort -V \
         | tail -1
 )"
+echo "  Memcached version: $memcached_version"
 
 redis_version="$(
     git ls-remote --tags https://github.com/phpredis/phpredis.git \
@@ -58,6 +62,7 @@ redis_version="$(
         | sort -V \
         | tail -1
 )"
+echo "  Redis version: $redis_version"
 
 declare -A pecl_versions=(
     [APCu]="$apcu_version"
@@ -74,16 +79,17 @@ _githubapi() {
 }
 
 version="$(_githubapi 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name')"
+echo "  Monica version: $version"
 commit="$(_githubapi 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
+echo "  Commit: $commit"
 
 head=$(_template .templates/Dockerfile-head.template)
 foot=$(_template .templates/Dockerfile-foot.template)
 extra=$(_template .templates/Dockerfile-extra.template)
 install=$(_template .templates/Dockerfile-install.template)
 
-set -x
-
 for variant in apache fpm fpm-alpine; do
+	echo Generating $variant variant...
     rm -rf $variant
     mkdir -p $variant
     phpVersion=${php_version[$version]-${php_version[default]}}

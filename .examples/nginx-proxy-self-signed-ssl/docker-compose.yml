@@ -22,7 +22,8 @@ version: "3.4"
 
 services:
   app:
-    image: monica:fpm
+    build: ./app
+    image: monica-app
     env_file: .env
     volumes:
       - data:/var/www/html/storage
@@ -47,7 +48,8 @@ services:
     restart: always
 
   cron:
-    image: monica:fpm
+    build: ./app
+    image: monica-app
     env_file: .env
     restart: always
     volumes:
@@ -58,7 +60,8 @@ services:
       - redis
 
   queue:
-    image: monica:fpm
+    build: ./app
+    image: monica-app
     env_file: .env
     restart: always
     volumes:
@@ -70,6 +73,7 @@ services:
 
   web:
     build: ./web
+    image: monica-web
     restart: always
     environment:
       - VIRTUAL_HOST=monica.local

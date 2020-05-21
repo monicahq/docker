@@ -3,6 +3,7 @@ version: "3.4"
 services:
   app:
     build: ./app
+    image: monica-app
     depends_on:
       - db
     env_file: .env
@@ -15,6 +16,7 @@ services:
 
   web:
     build: ./web
+    image: monica-web
     restart: always
     ports:
       - 8881:80

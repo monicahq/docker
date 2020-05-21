@@ -73,12 +73,7 @@ RUN set -ex; \
         | xargs -rt apt-mark manual; \
         \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-    rm -rf /var/lib/apt/lists/*; \
-    \
-    if command -v a2enmod; then \
-        a2enmod rewrite; \
-    fi
-
+    rm -rf /var/lib/apt/lists/*
 
 %%EXTRA_INSTALL%%
 

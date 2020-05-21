@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
       org.opencontainers.image.title="MonicaHQ, the Personal Relationship Manager" \
       org.opencontainers.image.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
       org.opencontainers.image.url="https://monicahq.com" \
-	  org.opencontainers.image.revision="3a1243d3195668171b8d096c0f903c08513336d9" \
+	org.opencontainers.image.revision="3a1243d3195668171b8d096c0f903c08513336d9" \
       org.opencontainers.image.source="https://github.com/monicahq/docker" \
       org.opencontainers.image.vendor="Monica" \
       org.opencontainers.image.version="v2.17.0"
@@ -83,12 +83,7 @@ RUN set -ex; \
         | xargs -rt apt-mark manual; \
         \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-    rm -rf /var/lib/apt/lists/*; \
-    \
-    if command -v a2enmod; then \
-        a2enmod rewrite; \
-    fi
-
+    rm -rf /var/lib/apt/lists/*
 
 # Set crontab for schedules
 RUN set -ex; \
@@ -140,11 +135,7 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keys.gnupg.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver pgp.mit.edu --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keyserver.pgp.com --recv-keys "$GPGKEY"; \
+    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \

@@ -5,10 +5,10 @@ LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
       org.opencontainers.image.title="MonicaHQ, the Personal Relationship Manager" \
       org.opencontainers.image.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
       org.opencontainers.image.url="https://monicahq.com" \
-      org.opencontainers.image.revision="3a1243d3195668171b8d096c0f903c08513336d9" \
+      org.opencontainers.image.revision="186f336799df2740df28198bfd2431f206668ff2" \
       org.opencontainers.image.source="https://github.com/monicahq/docker" \
       org.opencontainers.image.vendor="Monica" \
-      org.opencontainers.image.version="v2.17.0"
+      org.opencontainers.image.version="v2.18.0"
 
 # entrypoint.sh dependencies
 RUN set -ex; \
@@ -135,7 +135,7 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v2.17.0
+ENV MONICA_VERSION v2.18.0
 
 RUN set -ex; \
     fetchDeps=" \

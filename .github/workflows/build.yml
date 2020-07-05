@@ -26,6 +26,7 @@ jobs:
 
     - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
       run: |
+        docker pull php:7.3-${{ matrix.variant }}
         docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
         docker images
 

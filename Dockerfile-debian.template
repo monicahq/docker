@@ -25,7 +25,6 @@ RUN set -ex; \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libgmp-dev \
-        libsodium-dev \
         libmemcached-dev \
     ; \
     \
@@ -37,17 +36,12 @@ RUN set -ex; \
     docker-php-ext-install -j$(nproc) \
         intl \
         zip \
-        json \
-        iconv \
         bcmath \
         gd \
         gmp \
         pdo_mysql \
         mysqli \
         soap \
-        sodium \
-        mbstring \
-        opcache \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately

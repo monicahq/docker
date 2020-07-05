@@ -5,10 +5,8 @@ LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
       org.opencontainers.image.title="MonicaHQ, the Personal Relationship Manager" \
       org.opencontainers.image.description="This is MonicaHQ, your personal memory! MonicaHQ is like a CRM but for the friends, family, and acquaintances around you." \
       org.opencontainers.image.url="https://monicahq.com" \
-      org.opencontainers.image.revision="186f336799df2740df28198bfd2431f206668ff2" \
       org.opencontainers.image.source="https://github.com/monicahq/docker" \
-      org.opencontainers.image.vendor="Monica" \
-      org.opencontainers.image.version="v2.18.0"
+      org.opencontainers.image.vendor="Monica"
 
 # entrypoint.sh dependencies
 RUN set -ex; \
@@ -35,7 +33,6 @@ RUN set -ex; \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libgmp-dev \
-        libsodium-dev \
         libmemcached-dev \
     ; \
     \
@@ -47,23 +44,18 @@ RUN set -ex; \
     docker-php-ext-install -j$(nproc) \
         intl \
         zip \
-        json \
-        iconv \
         bcmath \
         gd \
         gmp \
         pdo_mysql \
         mysqli \
         soap \
-        sodium \
-        mbstring \
-        opcache \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.18; \
     pecl install memcached-3.1.5; \
-    pecl install redis-5.2.2; \
+    pecl install redis-5.3.0; \
     \
     docker-php-ext-enable \
         apcu \
@@ -99,6 +91,7 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
 RUN set -ex; \
     \
+    docker-php-ext-enable opcache; \
     { \
         echo '[opcache]'; \
         echo 'opcache.enable=1'; \
@@ -121,6 +114,8 @@ WORKDIR /var/www/html
 
 # Define Monica version
 ENV MONICA_VERSION v2.18.0
+LABEL org.opencontainers.image.revision="186f336799df2740df28198bfd2431f206668ff2" \
+      org.opencontainers.image.version="%%VERSION%%"
 
 RUN set -ex; \
     fetchDeps=" \

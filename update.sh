@@ -104,7 +104,7 @@ for variant in apache fpm fpm-alpine; do
         s/%%VARIANT%%/'"$variant"'/;
         s/%%PHP_VERSION%%/'"$phpVersion"'/;
         s#%%LABEL%%#'"$label"'#;
-        s/%%VERSION%%/'"$version"'/;
+        s/%%VERSION%%/'"$version"'/g;
         s/%%COMMIT%%/'"$commit"'/;
         s/%%CMD%%/'"${cmd[$variant]}"'/;
         s#%%APACHE_DOCUMENT%%#'"${document[$variant]}"'#;

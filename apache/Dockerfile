@@ -55,7 +55,7 @@ RUN set -ex; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.18; \
     pecl install memcached-3.1.5; \
-    pecl install redis-5.3.0; \
+    pecl install redis-5.3.1; \
     \
     docker-php-ext-enable \
         apcu \
@@ -119,9 +119,8 @@ RUN set -ex; \
     } > $APACHE_CONFDIR/conf-available/remoteip.conf; \
     a2enconf remoteip
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN set -ex; \
-    \
+    APACHE_DOCUMENT_ROOT=/var/www/html/public; \
     sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" $APACHE_CONFDIR/sites-available/*.conf; \
     sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" $APACHE_CONFDIR/apache2.conf $APACHE_CONFDIR/conf-available/*.conf
 

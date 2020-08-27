@@ -34,6 +34,7 @@ RUN set -ex; \
         libjpeg62-turbo-dev \
         libgmp-dev \
         libmemcached-dev \
+        libmagickwand-dev \
     ; \
     \
     debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
@@ -56,11 +57,13 @@ RUN set -ex; \
     pecl install APCu-5.1.18; \
     pecl install memcached-3.1.5; \
     pecl install redis-5.3.1; \
+    pecl install imagick-3.4.4; \
     \
     docker-php-ext-enable \
         apcu \
         memcached \
         redis \
+        imagick \
     ; \
     \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies

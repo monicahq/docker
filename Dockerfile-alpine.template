@@ -22,6 +22,7 @@ RUN set -ex; \
         jpeg-dev \
         gmp-dev \
         libmemcached-dev \
+        imagemagick-dev \
     ; \
     \
     docker-php-ext-configure intl; \
@@ -46,11 +47,13 @@ RUN set -ex; \
     pecl install APCu-%%APCU_VERSION%%; \
     pecl install memcached-%%MEMCACHED_VERSION%%; \
     pecl install redis-%%REDIS_VERSION%%; \
+    pecl install imagick-%%IMAGICK_VERSION%%; \
     \
     docker-php-ext-enable \
         apcu \
         memcached \
         redis \
+        imagick \
     ; \
     \
     runDeps="$( \

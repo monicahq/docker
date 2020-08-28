@@ -24,13 +24,23 @@ jobs:
       run: |
         sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
 
-    - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
+    - name: Update base image
+      if: matrix.arch == 'i386'
+      run: |
+        docker pull i386/php:7.3-${{ matrix.variant }}
+
+    - name: Update base image
+      if: matrix.arch != 'i386'
       run: |
         docker pull php:7.3-${{ matrix.variant }}
+
+    - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
+      run: |
         docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
         docker images
 
     - name: Test image ${{ matrix.variant }} ${{ matrix.arch }}
+      if: matrix.arch != 'i386' || matrix.variant != 'apache'
       run: |
         official-images/test/run.sh monica:${{ matrix.variant }}
 

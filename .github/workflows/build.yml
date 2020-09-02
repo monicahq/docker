@@ -45,7 +45,7 @@ jobs:
         official-images/test/run.sh monica:${{ matrix.variant }}
 
     - name: Publish package
-      if: github.ref == 'master' && matrix.arch != 'i386'
+      if: github.ref == 'refs/heads/master' && matrix.arch != 'i386'
       run: |
         echo "$password" | docker login ghcr.io -u $username --password-stdin
         docker tag monica:${{ matrix.variant }} ghcr.io/monicahq/monica-dev:${{ matrix.variant }}

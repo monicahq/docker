@@ -1,6 +1,20 @@
 # Monica's docker image
 
-<img alt="Logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Docker_%28container_engine%29_logo.svg/915px-Docker_%28container_engine%29_logo.svg.png" width="290" height="69" />
+[![Docker Pulls](https://img.shields.io/docker/pulls/library/monica.svg)](https://hub.docker.com/_/monica/)
+![Monica's docker](https://github.com/monicahq/docker/workflows/Monica's%20docker/badge.svg)
+
+[![amd64 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/amd64/job/monica.svg?label=amd64)](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/monica)
+[![arm32v5 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v5/job/monica.svg?label=arm32v5)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v5/job/monica)
+[![arm32v6 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/monica.svg?label=arm32v6)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/monica)
+[![arm32v7 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/monica.svg?label=arm32v7)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/monica)
+[![arm64v8 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/monica.svg?label=arm64v8)](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/monica)
+[![i386 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/i386/job/monica.svg?label=i386)](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/monica)
+[![mips64le build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/mips64le/job/monica.svg?label=mips64le)](https://doi-janky.infosiftr.net/job/multiarch/job/mips64le/job/monica)
+[![ppc64le build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/monica.svg?label=ppc64le)](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/monica)
+[![s390x build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/s390x/job/monica.svg?label=s390x)](https://doi-janky.infosiftr.net/job/multiarch/job/s390x/job/monica)
+
+
+[![MonicaHQ](https://avatars0.githubusercontent.com/u/25832602?s=200&v=4)](https://hub.docker.com/_/monica)
 
 Monica can run with Docker images.
 
@@ -24,7 +38,7 @@ The `fpm` tag contains a fastCGI-Process that serves the web pages. This image s
 ### Using the apache image
 
 This image contains a webserver that exposes port 80. Run the container with:
-```sh
+```console
 docker run -d -p 8080:80 monica
 ```
 
@@ -32,7 +46,7 @@ docker run -d -p 8080:80 monica
 
 This image serves a fastCGI server that exposes port 9000. You may need an additional web server that can proxy requests to the fpm port 9000 of the container.
 Run this container with:
-```sh
+```console
 docker run -d -p 9000:9000 monica:fpm
 ```
 
@@ -41,11 +55,30 @@ docker run -d -p 9000:9000 monica:fpm
 To have a persistent storage for your datas, you may want to create volumes for your db, and for monica you will have to save the `/var/www/monica/storage` directory.
 
 Run a container with this named volume:
-```sh
+```console
 docker run -d 
 -v monica_data:/var/www/html/storage
 monica
 ```
+
+### Connect to a mysql database
+
+Monica needs a database connection, and currently supports mysql only. Run these to have a running environment:
+```console
+mysqlCid="$(docker run -d \
+ -e MYSQL_RANDOM_ROOT_PASSWORD=true \
+ -e MYSQL_DATABASE=monica \
+ -e MYSQL_USER=homestead \
+ -e MYSQL_PASSWORD=secret \
+ "mysql:5.7")"
+docker run -d \
+ --link "$mysqlCid":mysql \
+ -e DB_HOST=mysql \
+ -p 8080:80 \
+ monica
+```
+Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system.
+If this looks ok, add your first user account.
 
 ### Run commands inside the container
 

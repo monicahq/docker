@@ -68,7 +68,6 @@ jobs:
       run: |
         curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
         chmod +x "bashbrew"
-        echo "::add-path::$(pwd)"
     - name: Run stackbrew
       run: |
         ./generate-stackbrew-library.sh

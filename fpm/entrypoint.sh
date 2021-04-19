@@ -4,24 +4,25 @@ set -Eeo pipefail
 
 # wait for the database to start
 waitfordb() {
-    HOST=${DB_HOST:-mysql}
-    PORT=${DB_PORT:-3306}
-    echo "Connecting to ${HOST}:${PORT}"
+    if [ ! -n "${DB_UNIX_SOCKET}" ]; then
+        HOST=${DB_HOST:-mysql}
+        PORT=${DB_PORT:-3306}
+        echo "Connecting to ${HOST}:${PORT}"
 
-    attempts=0
-    max_attempts=30
-    while [ $attempts -lt $max_attempts ]; do
-        busybox nc -w 1 "${HOST}:${PORT}" && break
-        echo "Waiting for ${HOST}:${PORT}..."
-        sleep 1
-        let "attempts=attempts+1"
-    done
+        attempts=0
+        max_attempts=30
+        while [ $attempts -lt $max_attempts ]; do
+            busybox nc -w 1 "${HOST}:${PORT}" && break
+            echo "Waiting for ${HOST}:${PORT}..."
+            sleep 1
+            let "attempts=attempts+1"
+        done
 
-    if [ $attempts -eq $max_attempts ]; then
-        echo "Unable to contact your database at ${HOST}:${PORT}"
-        exit 1
+        if [ $attempts -eq $max_attempts ]; then
+            echo "Unable to contact your database at ${HOST}:${PORT}"
+            exit 1
+        fi
     fi
-
     echo "Waiting for database to settle..."
     sleep 3
 }

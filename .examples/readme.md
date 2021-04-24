@@ -8,6 +8,7 @@ In this section you will find some examples about how to use monica's docker ima
 | [`nginx-proxy-self-signed-ssl`](nginx-proxy-self-signed-ssl) | shows you how to run monica with a self signed ssl certificate.
 | [`nginx-proxy`](nginx-proxy) | shows you how to run monica with https and generate a [Let's Encrypt](https://letsencrypt.org/) certificate.
 | [`maxsize`](maxsize) | shows you how to adapt the max upload size of you php settings in the app container.
+| [`raspberrypi`](raspberrypi) | shows you how to host monica on a raspberry pi.
 
 
 ## Run with docker-compose

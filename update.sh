@@ -9,7 +9,7 @@ _template() {
 }
 
 declare -A php_version=(
-    [default]='7.4'
+    [default]='8.0'
 )
 
 declare -A cmd=(

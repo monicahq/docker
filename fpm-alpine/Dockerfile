@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 # opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \

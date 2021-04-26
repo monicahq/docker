@@ -27,12 +27,12 @@ jobs:
     - name: Update base image
       if: matrix.arch == 'i386'
       run: |
-        docker pull i386/php:7.3-${{ matrix.variant }}
+        docker pull i386/php:7.4-${{ matrix.variant }}
 
     - name: Update base image
       if: matrix.arch != 'i386'
       run: |
-        docker pull php:7.3-${{ matrix.variant }}
+        docker pull php:7.4-${{ matrix.variant }}
 
     - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
       run: |

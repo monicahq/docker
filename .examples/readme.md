@@ -4,6 +4,7 @@ In this section you will find some examples about how to use monica's docker ima
 
 | Example | Description |
 |---------|-------------|
+| [`simple`](simple) | simple example that run a container.
 | [`supervisor`](supervisor) | uses supervisor to run a cron and a queue inside your container.
 | [`nginx-proxy-self-signed-ssl`](nginx-proxy-self-signed-ssl) | shows you how to run monica with a self signed ssl certificate.
 | [`nginx-proxy`](nginx-proxy) | shows you how to run monica with https and generate a [Let's Encrypt](https://letsencrypt.org/) certificate.
@@ -22,9 +23,7 @@ curl -sS https://raw.githubusercontent.com/monicahq/monica/master/.env.example -
 
 Open the file in an editor and update it for your own needs:
 
-- Set `APP_KEY` to a random 32-character string. For example, if you
-  have the `pwgen` utility installed, you could copy and paste the
-  output of `pwgen -s 32 1`.
+- Set `APP_KEY` to a random 32-character string. You can for instance copy and paste the output of `echo -n 'base64:'; openssl rand -base64 32`.
 - Edit the `MAIL_*` settings to point to your own [mailserver](/docs/installation/mail.md).
 - Set `DB_*` settings to point to your database configuration. If you don't want to set a db prefix, be careful to set `DB_PREFIX=` and not `DB_PREFIX=''` as docker will not expand this as an empty string.
 - Set `DB_HOST=db` or any name of the database container you will link to.

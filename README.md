@@ -108,9 +108,7 @@ This version will use the apache image and add a mysql container. The volumes ar
 
 Make sure to pass in values for `APP_KEY` variable before you run this setup.
 
-Set `APP_KEY` to a random 32-character string. For example, if you
-have the `pwgen` utility installed, you could copy and paste the
-output of `pwgen -s 32 1`.
+Set `APP_KEY` to a random 32-character string. You can for instance copy and paste the output of `echo -n 'base64:'; openssl rand -base64 32`.
 
 1. Create a `docker-compose.yml` file
 
@@ -149,11 +147,9 @@ volumes:
     name: mysql
 ```
 
-2. Set a value for `APP_KEY` variable before you run this setup.
-   It should be a random 32-character string. For example, if you have the `pwgen` utility installed,
-   you can copy and paste the output of
+2. Set a value for `APP_KEY` variable before you run this setup. You can for instance copy and paste the output of
    ```sh
-   pwgen -s 32 1
+   echo -n 'base64:'; openssl rand -base64 32
    ```
 
 3. Run
@@ -226,11 +222,9 @@ volumes:
     name: mysql
 ```
 
-3. Set a value for `APP_KEY` variable before you run this setup.
-   It should be a random 32-character string. For example, if you have the `pwgen` utility installed,
-   you can copy and paste the output of
+3. Set a value for `APP_KEY` variable before you run this setup. You can for instance copy and paste the output of
    ```sh
-   pwgen -s 32 1
+   echo -n 'base64:'; openssl rand -base64 32
    ```
 
 4. Run

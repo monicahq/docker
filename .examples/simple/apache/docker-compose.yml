@@ -2,28 +2,16 @@ version: "3.4"
 
 services:
   app:
-    build: ./app
-    image: monica-app
+    image: monica:apache
     depends_on:
       - db
-    env_file: .env
+    ports:
+      - 80:80
     environment:
       - DB_HOST=db
-      - DEFAULT_MAX_UPLOAD_SIZE=500000
     volumes:
       - data:/var/www/html/storage
     restart: always
-
-  web:
-    build: ./web
-    image: monica-web
-    restart: always
-    ports:
-      - 80:80
-    volumes:
-      - data:/var/www/html/storage:ro
-    depends_on:
-      - app
 
   db:
     image: mysql:5.7
@@ -38,4 +26,6 @@ services:
 
 volumes:
   data:
+    name: data
   mysql:
+    name: mysql

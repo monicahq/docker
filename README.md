@@ -125,6 +125,8 @@ services:
     environment:
       - APP_KEY=
       - DB_HOST=db
+      - DB_USERNAME=homestead
+      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always

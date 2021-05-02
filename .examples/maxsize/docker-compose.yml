@@ -9,6 +9,8 @@ services:
     env_file: .env
     environment:
       - DB_HOST=db
+      - DB_USERNAME=monica
+      - DB_PASSWORD=secret
       - DEFAULT_MAX_UPLOAD_SIZE=500000
     volumes:
       - data:/var/www/html/storage
@@ -30,7 +32,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
-      - MYSQL_USER=homestead
+      - MYSQL_USER=monica
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql:/var/lib/mysql

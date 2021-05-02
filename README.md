@@ -125,7 +125,7 @@ services:
     environment:
       - APP_KEY=
       - DB_HOST=db
-      - DB_USERNAME=homestead
+      - DB_USERNAME=usermonica
       - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
@@ -136,7 +136,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
-      - MYSQL_USER=homestead
+      - MYSQL_USER=usermonica
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql:/var/lib/mysql
@@ -192,6 +192,8 @@ services:
     environment:
       - APP_KEY=
       - DB_HOST=db
+      - DB_USERNAME=usermonica
+      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always
@@ -211,7 +213,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
-      - MYSQL_USER=homestead
+      - MYSQL_USER=usermonica
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql:/var/lib/mysql

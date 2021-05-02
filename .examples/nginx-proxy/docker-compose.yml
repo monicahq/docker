@@ -8,7 +8,7 @@
 #- DB_HOST=db
 # See `db` container for these values:
 #- DB_DATABASE=monica
-#- DB_USERNAME=homestead
+#- DB_USERNAME=monica
 #- DB_PASSWORD=secret
 #
 # To use redis:
@@ -24,6 +24,10 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=monica
+      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always
@@ -36,7 +40,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
-      - MYSQL_USER=homestead
+      - MYSQL_USER=monica
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql:/var/lib/mysql
@@ -50,6 +54,10 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=monica
+      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage
@@ -62,6 +70,10 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=monica
+      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage

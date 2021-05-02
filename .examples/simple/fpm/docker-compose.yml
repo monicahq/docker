@@ -7,6 +7,8 @@ services:
       - db
     environment:
       - DB_HOST=db
+      - DB_USERNAME=monica
+      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always
@@ -26,7 +28,7 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
-      - MYSQL_USER=homestead
+      - MYSQL_USER=monica
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql:/var/lib/mysql

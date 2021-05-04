@@ -9,7 +9,7 @@ _template() {
 }
 
 declare -A php_version=(
-    [default]='7.4'
+    [default]='8.0'
 )
 
 declare -A cmd=(
@@ -64,21 +64,10 @@ redis_version="$(
 )"
 echo "  Redis version: $redis_version"
 
-imagick_version="$(
-	git ls-remote --tags https://github.com/mkoppanen/imagick.git \
-		| cut -d/ -f3 \
-		| grep -viE '[a-z]' \
-		| tr -d '^{}' \
-		| sort -V \
-		| tail -1
-)"
-echo "  Imagick version: $imagick_version"
-
 declare -A pecl_versions=(
     [APCu]="$apcu_version"
     [memcached]="$memcached_version"
     [redis]="$redis_version"
-    [imagick]="$imagick_version"
 )
 
 _githubapi() {
@@ -122,7 +111,6 @@ for variant in apache fpm fpm-alpine; do
         s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;
         s/%%MEMCACHED_VERSION%%/'"${pecl_versions[memcached]}"'/;
         s/%%REDIS_VERSION%%/'"${pecl_versions[redis]}"'/;
-        s/%%IMAGICK_VERSION%%/'"${pecl_versions[imagick]}"'/;
     ' \
         -e "s/%0A/\n/g;" \
         $template > "$variant/Dockerfile"

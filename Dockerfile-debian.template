@@ -26,7 +26,6 @@ RUN set -ex; \
         libjpeg62-turbo-dev \
         libgmp-dev \
         libmemcached-dev \
-        libmagickwand-dev \
         libwebp-dev \
     ; \
     \
@@ -50,13 +49,11 @@ RUN set -ex; \
     pecl install APCu-%%APCU_VERSION%%; \
     pecl install memcached-%%MEMCACHED_VERSION%%; \
     pecl install redis-%%REDIS_VERSION%%; \
-    pecl install imagick-%%IMAGICK_VERSION%%; \
     \
     docker-php-ext-enable \
         apcu \
         memcached \
         redis \
-        imagick \
     ; \
     \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies

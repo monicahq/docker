@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 # opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
@@ -30,7 +30,6 @@ RUN set -ex; \
         jpeg-dev \
         gmp-dev \
         libmemcached-dev \
-        imagemagick-dev \
         libwebp-dev \
     ; \
     \
@@ -51,13 +50,11 @@ RUN set -ex; \
     pecl install APCu-5.1.20; \
     pecl install memcached-3.1.5; \
     pecl install redis-5.3.4; \
-    pecl install imagick-3.4.4; \
     \
     docker-php-ext-enable \
         apcu \
         memcached \
         redis \
-        imagick \
     ; \
     \
     runDeps="$( \
@@ -105,9 +102,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.0.0
-LABEL org.opencontainers.image.revision="02ba3694929154ecdafbe95fa34ad6920680b6b7" \
-      org.opencontainers.image.version="v3.0.0"
+ENV MONICA_VERSION v3.0.1
+LABEL org.opencontainers.image.revision="fbac24891a9ace9f9c88fd4d23b8612243af283a" \
+      org.opencontainers.image.version="v3.0.1"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \

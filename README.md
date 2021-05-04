@@ -52,7 +52,7 @@ docker run -d -p 9000:9000 monica:fpm
 
 ### Persistent data storage
 
-To have a persistent storage for your datas, you may want to create volumes for your db, and for monica you will have to save the `/var/www/monica/storage` directory.
+To have a persistent storage for your datas, you may want to create volumes for your db, and for monica you will have to save the `/var/www/html/storage` directory.
 
 Run a container with this named volume:
 ```console

@@ -6,8 +6,6 @@ set -Eeo pipefail
 waitfordb() {
 	TERM=dumb php -- <<'EOPHP'
 <?php
-// database might not exist, so let's try creating it (just to be safe)
-
 function env(string $name, ?string $default = null): ?string
 {
     $val = getenv($name);
@@ -31,6 +29,9 @@ if (! env('DATABASE_URL')) {
     $pass = $url['pass'];
     $database = ltrim($url['path'], '/');
 	$socket = null;
+    if ($url['query'] && strpos($url['query'], 'unix_socket=') !== false) {
+        $socket = substr($url['query'], strlen('unix_socket='));
+    }
 }
 
 $collation = ((bool) env('DB_USE_UTF8MB4', true)) ? ['utf8mb4','utf8mb4_unicode_ci'] : ['utf8','utf8_unicode_ci'];
@@ -43,17 +44,21 @@ do {
 		--$maxAttempts;
 		if ($maxAttempts <= 0) {
             fwrite($stderr, "\n" . 'Unable to contact your database');
+            $mysql->close();
 			exit(1);
 		}
         fwrite($stderr, "\n" . 'Waiting for database to settle...');
-		sleep(3);
+		sleep(1);
 	}
 } while ($mysql->connect_error);
+fwrite($stderr, "\n" . 'Database ready.');
+
 if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($database) . '` CHARACTER SET ' . $collation[0] . ' COLLATE ' . $collation[1])) {
 	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
 	$mysql->close();
 	exit(1);
 }
+
 $mysql->close();
 EOPHP
 }

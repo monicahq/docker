@@ -4,9 +4,9 @@ set -Eeo pipefail
 
 # wait for the database to start
 waitfordb() {
-
 	TERM=dumb php -- <<'EOPHP'
 <?php
+// database might not exist, so let's try creating it (just to be safe)
 
 function env(string $name, ?string $default = null): ?string
 {
@@ -14,7 +14,6 @@ function env(string $name, ?string $default = null): ?string
     return $val === false ? $default : $val;
 }
 
-// database might not exist, so let's try creating it (just to be safe)
 $stderr = fopen('php://stderr', 'w');
 
 if (! env('DATABASE_URL')) {
@@ -36,13 +35,13 @@ if (! env('DATABASE_URL')) {
 
 $collation = ((bool) env('DB_USE_UTF8MB4', true)) ? ['utf8mb4','utf8mb4_unicode_ci'] : ['utf8','utf8_unicode_ci'];
 
-$max_attempts = 30;
+$maxAttempts = 30;
 do {
 	$mysql = new mysqli($host, $user, $pass, '', $port, $socket);
 	if ($mysql->connect_error) {
 		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
-		--$maxTries;
-		if ($maxTries <= 0) {
+		--$maxAttempts;
+		if ($maxAttempts <= 0) {
             fwrite($stderr, "\n" . 'Unable to contact your database');
 			exit(1);
 		}

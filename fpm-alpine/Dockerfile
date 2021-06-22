@@ -132,7 +132,7 @@ RUN set -ex; \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \
     \
     gpgconf --kill all; \
-    rm -r "$GNUPGHOME" monica-${MONICA_VERSION}.tar.bz2 monica-${MONICA_VERSION}.tar.bz2.asc; \
+    rm -rf "$GNUPGHOME" monica-${MONICA_VERSION}.tar.bz2 monica-${MONICA_VERSION}.tar.bz2.asc; \
     \
     cp /var/www/html/.env.example /var/www/html/.env; \
     chown -R www-data:www-data /var/www/html; \

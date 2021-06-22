@@ -4,7 +4,7 @@ set -Eeo pipefail
 
 # wait for the database to start
 waitfordb() {
-	TERM=dumb php -- <<'EOPHP'
+    TERM=dumb php -- <<'EOPHP'
 <?php
 function env(string $name, ?string $default = null): ?string
 {
@@ -28,7 +28,7 @@ if (! env('DATABASE_URL')) {
     $user = $url['user'];
     $pass = $url['pass'];
     $database = ltrim($url['path'], '/');
-	$socket = null;
+    $socket = null;
     if ($url['query'] && strpos($url['query'], 'unix_socket=') !== false) {
         $socket = substr($url['query'], strlen('unix_socket='));
     }
@@ -38,25 +38,25 @@ $collation = ((bool) env('DB_USE_UTF8MB4', true)) ? ['utf8mb4','utf8mb4_unicode_
 
 $maxAttempts = 30;
 do {
-	$mysql = new mysqli($host, $user, $pass, '', $port, $socket);
-	if ($mysql->connect_error) {
-		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
-		--$maxAttempts;
-		if ($maxAttempts <= 0) {
+    $mysql = new mysqli($host, $user, $pass, '', $port, $socket);
+    if ($mysql->connect_error) {
+        fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
+        --$maxAttempts;
+        if ($maxAttempts <= 0) {
             fwrite($stderr, "\n" . 'Unable to contact your database');
             $mysql->close();
-			exit(1);
-		}
+            exit(1);
+        }
         fwrite($stderr, "\n" . 'Waiting for database to settle...');
-		sleep(1);
-	}
+        sleep(1);
+    }
 } while ($mysql->connect_error);
 fwrite($stderr, "\n" . 'Database ready.');
 
 if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($database) . '` CHARACTER SET ' . $collation[0] . ' COLLATE ' . $collation[1])) {
-	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
-	$mysql->close();
-	exit(1);
+    fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
+    $mysql->close();
+    exit(1);
 }
 
 $mysql->close();

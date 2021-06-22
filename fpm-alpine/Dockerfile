@@ -102,9 +102,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.0.1
-LABEL org.opencontainers.image.revision="fbac24891a9ace9f9c88fd4d23b8612243af283a" \
-      org.opencontainers.image.version="v3.0.1"
+ENV MONICA_VERSION v3.1.0
+LABEL org.opencontainers.image.revision="a3fdac949f662d08ced6e02bcf63fd5106600fb0" \
+      org.opencontainers.image.version="v3.1.0"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \
@@ -118,13 +118,21 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY"; \
+    for server in $(shuf -e ha.pool.sks-keyservers.net \
+                            hkp://p80.pool.sks-keyservers.net:80 \
+                            keyserver.ubuntu.com \
+                            hkp://keyserver.ubuntu.com:80 \
+                            pgp.mit.edu) ; do \
+        if gpg --batch --keyserver "${server}" --recv-keys "$GPGKEY"; then \
+            break; \
+        fi; \
+    done; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \
     \
     gpgconf --kill all; \
-    rm -r "$GNUPGHOME" monica-${MONICA_VERSION}.tar.bz2 monica-${MONICA_VERSION}.tar.bz2.asc; \
+    rm -rf "$GNUPGHOME" monica-${MONICA_VERSION}.tar.bz2 monica-${MONICA_VERSION}.tar.bz2.asc; \
     \
     cp /var/www/html/.env.example /var/www/html/.env; \
     chown -R www-data:www-data /var/www/html; \

@@ -114,9 +114,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.1.0
-LABEL org.opencontainers.image.revision="a3fdac949f662d08ced6e02bcf63fd5106600fb0" \
-      org.opencontainers.image.version="v3.1.0"
+ENV MONICA_VERSION v3.1.1
+LABEL org.opencontainers.image.revision="13325cc8c1f32b391905a35abb166f843faef142" \
+      org.opencontainers.image.version="v3.1.1"
 
 RUN set -ex; \
     fetchDeps=" \
@@ -131,15 +131,7 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    for server in $(shuf -e ha.pool.sks-keyservers.net \
-                            hkp://p80.pool.sks-keyservers.net:80 \
-                            keyserver.ubuntu.com \
-                            hkp://keyserver.ubuntu.com:80 \
-                            pgp.mit.edu) ; do \
-        if gpg --batch --keyserver "${server}" --recv-keys "$GPGKEY"; then \
-            break; \
-        fi; \
-    done; \
+    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \

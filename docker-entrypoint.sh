@@ -65,18 +65,43 @@ EOPHP
 
 if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ]; then
 
+    uid="$(id -u)"
+    gid="$(id -g)"
+    if [ "$uid" = '0' ]; then
+        case "$1" in
+            php-fpm*)
+                user='www-data'
+                group='www-data'
+                ;;
+            *) # apache
+                user="${APACHE_RUN_USER:-www-data}"
+                group="${APACHE_RUN_GROUP:-www-data}"
+
+                # strip off any '#' symbol ('#1000' is valid syntax for Apache)
+                pound='#'
+                user="${user#$pound}"
+                group="${group#$pound}"
+                ;;
+        esac
+    else
+        user="$uid"
+        group="$gid"
+    fi
+
     MONICADIR=/var/www/html
     ARTISAN="php ${MONICADIR}/artisan"
 
     # Ensure storage directories are present
-    STORAGE=${MONICADIR}/storage
-    mkdir -p ${STORAGE}/logs
-    mkdir -p ${STORAGE}/app/public
-    mkdir -p ${STORAGE}/framework/views
-    mkdir -p ${STORAGE}/framework/cache
-    mkdir -p ${STORAGE}/framework/sessions
-    chown -R www-data:www-data ${STORAGE}
-    chmod -R g+rw ${STORAGE}
+    if [ "$uid" = '0' ]; then
+        STORAGE=${MONICADIR}/storage
+        mkdir -p ${STORAGE}/logs
+        mkdir -p ${STORAGE}/app/public
+        mkdir -p ${STORAGE}/framework/views
+        mkdir -p ${STORAGE}/framework/cache
+        mkdir -p ${STORAGE}/framework/sessions
+        chown -R $user:$group ${STORAGE}
+        chmod -R g+rw ${STORAGE}
+    fi
 
     if [ -z "${APP_KEY:-}" -o "$APP_KEY" = "ChangeMeBy32KeyLengthOrGenerated" ]; then
         ${ARTISAN} key:generate --no-interaction

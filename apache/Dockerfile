@@ -128,9 +128,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.1.1
-LABEL org.opencontainers.image.revision="13325cc8c1f32b391905a35abb166f843faef142" \
-      org.opencontainers.image.version="v3.1.1"
+ENV MONICA_VERSION v3.1.2
+LABEL org.opencontainers.image.revision="8ba7d983efcef7555b620cb1a0bbc32db3835f00" \
+      org.opencontainers.image.version="v3.1.2"
 
 RUN set -ex; \
     fetchDeps=" \

@@ -1,0 +1,40 @@
+version: "3.4"
+
+services:
+  app:
+    image: monica
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - 8080:80
+    volumes:
+      - data:/var/www/html/storage
+    restart: always
+
+  cron:
+    image: monica
+    env_file: .env
+    restart: always
+    volumes:
+      - data:/var/www/html/storage
+    command: cron.sh
+    depends_on:
+      - db
+
+  db:
+    image: jsurf/rpi-mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: monica
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: always
+
+volumes:
+  data:
+    name: data
+  mysql:
+    name: mysql

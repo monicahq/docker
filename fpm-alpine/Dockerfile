@@ -102,9 +102,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.3.1
-LABEL org.opencontainers.image.revision="9c276aaa6e12c10b227f4fe95fbe215f67dcde9b" \
-      org.opencontainers.image.version="v3.3.1"
+ENV MONICA_VERSION v3.4.0
+LABEL org.opencontainers.image.revision="2e4b685604ce87169b29d3bba49ef80e405a5a5a" \
+      org.opencontainers.image.version="v3.4.0"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \

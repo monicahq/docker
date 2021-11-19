@@ -1,0 +1,48 @@
+name: Release update
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Release version
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Run update script
+        run: |
+          ./update.sh ${{ inputs.release }}
+
+      - name: Update
+        run: |
+          remote=upstream
+          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker"
+          branch="release-${{ inputs.release }}"
+          message="Update release ${{ inputs.release }}"
+
+          status=$(git status --porcelain)
+          if [ -n "$status" ]; then
+            echo $status
+            git add *
+            git config user.email $USER_EMAIL
+            git config user.name $USER_NAME
+            git checkout -b $branch
+            git commit -m "$message"
+            git remote remove $remote || true
+            git remote add -f $remote $remoteurl || true
+            git push $remote HEAD:$branch
+            gh pr create --title "$message"
+          else
+            echo "Already up to date"
+          fi
+        env:
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          GH_TOKEN: ${{ secrets.DOCKER_GITHUB_TOKEN }}

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+version=$1
 IFS='
 '
 
@@ -78,7 +79,9 @@ _githubapi() {
     fi
 }
 
-version="$(_githubapi 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name')"
+if [ -z "$version" ]; then
+  version="$(_githubapi 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' || _githubapi 'https://api.github.com/repos/monicahq/monica/releases' | jq -r '.[0].tag_name')"
+fi
 echo "  Monica version: $version"
 commit="$(_githubapi 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
 echo "  Commit: $commit"

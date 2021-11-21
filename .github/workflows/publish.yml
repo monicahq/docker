@@ -1,0 +1,59 @@
+name: Release update
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Release version
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    environment: docker-official
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: docker-library/official-images
+          path: official-images
+
+      - name: Install bashbrew
+        run: |
+          curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
+          chmod +x "bashbrew"
+
+      - name: Run stackbrew
+        run: |
+          ./generate-stackbrew-library.sh | tee official-images/library/monica
+
+      - name: Update
+        working-directory: official-images
+        run: |
+          remote=upstream
+          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/$USER_NAME/official-images"
+          branch="monica-${{ github.events.inputs.release }}"
+          message="Update Monica to ${{ github.events.inputs.release }}"
+
+          status=$(git status --porcelain)
+          if [ -n "$status" ]; then
+            git status
+            git add library/monica
+            git config user.email $USER_EMAIL
+            git config user.name $USER_NAME
+            git checkout -b $branch
+            git commit -m "$message"
+            git remote remove $remote || true
+            git remote add -f $remote $remoteurl || true
+            git push $remote HEAD:$branch
+            gh pr create --base docker-library:master --title "$message" --body "Update Monica to [${{ github.events.inputs.release }}](https://github.com/monicahq/monica/releases/tag/${{ github.events.inputs.release }})."
+          else
+            echo "Already up to date"
+          fi
+        env:
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          GH_TOKEN: ${{ secrets.PUSH_GITHUB_TOKEN }}

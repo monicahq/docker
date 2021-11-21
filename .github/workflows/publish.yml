@@ -16,19 +16,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: monica-docker
       - uses: actions/checkout@v2
         with:
           repository: docker-library/official-images
           path: official-images
 
       - name: Install bashbrew
+        working-directory: monica-docker
         run: |
           curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
           chmod +x "bashbrew"
 
       - name: Run stackbrew
+        working-directory: monica-docker
         run: |
-          ./generate-stackbrew-library.sh | tee official-images/library/monica
+          ./generate-stackbrew-library.sh | tee ../official-images/library/monica
 
       - name: Update
         working-directory: official-images

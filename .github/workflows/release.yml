@@ -2,11 +2,6 @@ name: Release update
 
 on:
   workflow_dispatch:
-    inputs:
-      release:
-        description: Release version
-        required: true
-        type: string
 
 jobs:
   release:
@@ -21,14 +16,15 @@ jobs:
 
       - name: Run update script
         run: |
-          ./update.sh ${{ github.events.inputs.release }}
+          ./update.sh
 
       - name: Update
         run: |
           remote=upstream
-          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker"
-          branch="release-${{ github.events.inputs.release }}"
-          message="Update to ${{ github.events.inputs.release }}"
+          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker.git"
+          latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
+          branch="release-$latest"
+          message="Update to $latest"
 
           status=$(git status --porcelain)
           if [ -n "$status" ]; then
@@ -41,7 +37,7 @@ jobs:
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
             git push $remote HEAD:$branch
-            gh pr create --title "$message" --body "Update Monica to [${{ github.events.inputs.release }}](https://github.com/monicahq/monica/releases/tag/${{ github.events.inputs.release }})."
+            gh pr create --title "$message" --body "Update Monica to [$latest](https://github.com/monicahq/monica/releases/tag/$latest)."
           else
             echo "Already up to date"
           fi

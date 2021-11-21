@@ -9,8 +9,11 @@ on:
         type: string
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
+
+    environment: monicahq-docker
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -18,18 +21,18 @@ jobs:
 
       - name: Run update script
         run: |
-          ./update.sh ${{ inputs.release }}
+          ./update.sh ${{ github.events.inputs.release }}
 
       - name: Update
         run: |
           remote=upstream
           remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker"
-          branch="release-${{ inputs.release }}"
-          message="Update release ${{ inputs.release }}"
+          branch="release-${{ github.events.inputs.release }}"
+          message="Update to ${{ github.events.inputs.release }}"
 
           status=$(git status --porcelain)
           if [ -n "$status" ]; then
-            echo $status
+            git status
             git add *
             git config user.email $USER_EMAIL
             git config user.name $USER_NAME
@@ -38,11 +41,11 @@ jobs:
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
             git push $remote HEAD:$branch
-            gh pr create --title "$message"
+            gh pr create --title "$message" --body "Update Monica to [${{ github.events.inputs.release }}](https://github.com/monicahq/monica/releases/tag/${{ github.events.inputs.release }})."
           else
             echo "Already up to date"
           fi
         env:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_NAME: ${{ secrets.USER_NAME }}
-          GH_TOKEN: ${{ secrets.DOCKER_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUSH_GITHUB_TOKEN }}

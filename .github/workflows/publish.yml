@@ -52,7 +52,7 @@ jobs:
             git remote remove $remote || true
             git remote add -f $remote "$remoteurl" || true
             git push --set-upstream $remote $branch
-            gh pr create --repo docker-library/master --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
+            gh pr create --repo docker-library/official-images --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
           else
             echo "Already up to date"
           fi

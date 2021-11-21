@@ -23,8 +23,8 @@ jobs:
           remote=upstream
           remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker.git"
           latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
-          branch="release-$latest"
-          message="Update to $latest"
+          branch="release-v$latest"
+          message="Update to v$latest"
 
           status=$(git status --porcelain)
           if [ -n "$status" ]; then
@@ -37,7 +37,7 @@ jobs:
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
             git push $remote HEAD:$branch
-            gh pr create --title "$message" --body "Update Monica to [$latest](https://github.com/monicahq/monica/releases/tag/$latest)."
+            gh pr create --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
           else
             echo "Already up to date"
           fi

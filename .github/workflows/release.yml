@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Run update script
         run: |
@@ -29,14 +29,14 @@ jobs:
           status=$(git status --porcelain)
           if [ -n "$status" ]; then
             git status
-            git add *
+            git add -A
             git config user.email $USER_EMAIL
             git config user.name $USER_NAME
             git checkout -b $branch
             git commit -m "$message"
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
-            git push $remote HEAD:$branch
+            git push --set-upstream $remote $branch
             gh pr create --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
           else
             echo "Already up to date"

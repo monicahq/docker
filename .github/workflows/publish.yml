@@ -33,7 +33,7 @@ jobs:
         working-directory: official-images
         run: |
           remote=upstream
-          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/$USER_NAME/official-images"
+          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/$USER_NAME/official-images.git"
           latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
           branch="monica-v$latest"
           message="Update Monica to $latest"
@@ -44,12 +44,11 @@ jobs:
             git add library/monica
             git config user.email $USER_EMAIL
             git config user.name $USER_NAME
-            git checkout -b $branch
             git commit -m "$message"
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
             git push $remote HEAD:$branch
-            gh pr create --base docker-library:master --title "$message" --body "Update Monica to [$latest](https://github.com/monicahq/monica/releases/tag/$latest)."
+            gh pr create --base docker-library:master --head $USER_NAME:$branch --title "$message" --body "Update Monica to [$latest](https://github.com/monicahq/monica/releases/tag/$latest)."
           else
             echo "Already up to date"
           fi

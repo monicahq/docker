@@ -36,7 +36,7 @@ jobs:
             git checkout -b $branch
             git commit -m "$message"
             git remote remove $remote || true
-            git remote add -f $remote $remoteurl || true
+            git remote add -f $remote "$remoteurl" || true
             git push --set-upstream $remote $branch
             gh pr create --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
           else

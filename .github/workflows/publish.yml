@@ -1,4 +1,4 @@
-name: Release update
+name: Publish official image
 
 on:
   workflow_dispatch:

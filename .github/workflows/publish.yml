@@ -13,10 +13,12 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: monica-docker
+          persist-credentials: false
       - uses: actions/checkout@v2
         with:
           repository: docker-library/official-images
           path: official-images
+          persist-credentials: false
 
       - name: Install bashbrew
         working-directory: monica-docker
@@ -36,7 +38,7 @@ jobs:
           remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/$USER_NAME/official-images.git"
           latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
           branch="monica-v$latest"
-          message="Update Monica to $latest"
+          message="Update Monica to v$latest"
 
           status=$(git status --porcelain)
           if [ -n "$status" ]; then
@@ -48,7 +50,7 @@ jobs:
             git remote remove $remote || true
             git remote add -f $remote $remoteurl || true
             git push $remote HEAD:$branch
-            gh pr create --base docker-library:master --head $USER_NAME:$branch --title "$message" --body "Update Monica to [$latest](https://github.com/monicahq/monica/releases/tag/$latest)."
+            gh pr create --base docker-library:master --head $USER_NAME:$branch --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
           else
             echo "Already up to date"
           fi

@@ -2,6 +2,28 @@
 
 set -Eeo pipefail
 
+# set environment variables with docker secrets in /run/secrets/*
+supportedSecrets=( "DB_PASSWORD" 
+                   "APP_KEY" 
+                   "HASH_SALT" 
+                   "MAIL_PASSWORD" 
+                   "REDIS_PASSWORD" 
+                   "AWS_KEY" 
+                   "AWS_SECRET" 
+                   "PASSPORT_PASSWORD_GRANT_CLIENT_ID" 
+                   "PASSPORT_PASSWORD_GRANT_CLIENT_SECRET" 
+                   "LOCATION_IQ_API_KEY"
+                  )
+for secret in ${supportedSecrets[@]}; do
+    envFile="${secret}_FILE"
+    if [ $(printenv ${envFile}) ]; then envFileName=`printenv ${envFile}`; fi
+    if [[ ${!envFile} && -f "$envFileName" ]]; then
+        val=`cat $envFileName`
+        export "${secret}"="$val"
+        echo "${secret} environment variable was set by secret ${envFile}"
+    fi
+done
+
 # wait for the database to start
 waitfordb() {
     TERM=dumb php -- <<'EOPHP'

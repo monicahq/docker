@@ -19,7 +19,7 @@ In this section you will find some examples about how to use monica's docker ima
 First, download a copy of Monica example configuration file:
 
 ```sh
-curl -sS https://raw.githubusercontent.com/monicahq/monica/master/.env.example -o .env
+curl -sS https://raw.githubusercontent.com/monicahq/monica/main/.env.example -o .env
 ```
 
 Open the file in an editor and update it for your own needs:

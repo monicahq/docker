@@ -24,7 +24,7 @@ jobs:
       - name: Install bashbrew
         working-directory: monica-docker
         run: |
-          curl -fsSL -o bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
+          curl -fsSL -o bashbrew https://github.com/docker-library/bashbrew/releases/download/v0.1.3/bashbrew-amd64
           chmod +x "bashbrew"
 
       - name: Run stackbrew

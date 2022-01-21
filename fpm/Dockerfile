@@ -54,9 +54,9 @@ RUN set -ex; \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
-    pecl install APCu-5.1.20; \
+    pecl install APCu-5.1.21; \
     pecl install memcached-3.1.5; \
-    pecl install redis-5.3.4; \
+    pecl install redis-5.3.6; \
     \
     docker-php-ext-enable \
         apcu \
@@ -114,9 +114,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.1.2
-LABEL org.opencontainers.image.revision="8ba7d983efcef7555b620cb1a0bbc32db3835f00" \
-      org.opencontainers.image.version="v3.1.2"
+ENV MONICA_VERSION v3.6.1
+LABEL org.opencontainers.image.revision="832b425502ad9d6059cabb9a70dd5351eb47fa81" \
+      org.opencontainers.image.version="v3.6.1"
 
 RUN set -ex; \
     fetchDeps=" \

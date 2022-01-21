@@ -1,0 +1,48 @@
+name: Release update
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    environment: monicahq-docker
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run update script
+        run: |
+          ./update.sh
+
+      - name: Update
+        run: |
+          remote=upstream
+          remoteurl="https://$USER_NAME:$GH_TOKEN@github.com/monicahq/docker.git"
+          latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
+          branch="release-v$latest"
+          message="Update to v$latest"
+
+          status=$(git status --porcelain)
+          if [ -n "$status" ]; then
+            git status
+            git add -A
+            git config user.email $USER_EMAIL
+            git config user.name $USER_NAME
+            git checkout -b $branch
+            git commit -m "$message"
+            git remote remove $remote || true
+            git remote add -f $remote "$remoteurl" || true
+            git push --set-upstream $remote $branch
+            gh pr create --title "$message" --body "Update Monica to [v$latest](https://github.com/monicahq/monica/releases/tag/v$latest)."
+          else
+            echo "Already up to date"
+          fi
+        env:
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          GH_TOKEN: ${{ secrets.PUSH_GITHUB_TOKEN }}

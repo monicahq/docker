@@ -63,6 +63,7 @@ if (! env('DATABASE_URL')) {
 }
 
 $collation = ((bool) env('DB_USE_UTF8MB4', true)) ? ['utf8mb4','utf8mb4_unicode_ci'] : ['utf8','utf8_unicode_ci'];
+mysqli_report(MYSQLI_REPORT_ERROR); // Report SQL errors as Warning in php 8.1+
 
 $maxAttempts = 30;
 do {

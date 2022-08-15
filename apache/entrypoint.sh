@@ -63,29 +63,36 @@ if (! env('DATABASE_URL')) {
 }
 
 $collation = ((bool) env('DB_USE_UTF8MB4', true)) ? ['utf8mb4','utf8mb4_unicode_ci'] : ['utf8','utf8_unicode_ci'];
-mysqli_report(MYSQLI_REPORT_ERROR); // Report SQL errors as Warning in php 8.1+
 
 $maxAttempts = 30;
+$mysql = null;
 do {
-    $mysql = new mysqli($host, $user, $pass, '', $port, $socket);
-    if ($mysql->connect_error) {
-        fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
-        --$maxAttempts;
-        if ($maxAttempts <= 0) {
-            fwrite($stderr, "\n" . 'Unable to contact your database');
-            $mysql->close();
-            exit(1);
-        }
+    try {
+        $mysql = new mysqli($host, $user, $pass, '', $port, $socket);
+        break;
+    } catch (\mysqli_sql_exception $e) {
         fwrite($stderr, "\n" . 'Waiting for database to settle...');
         sleep(1);
     }
-} while ($mysql->connect_error);
+    --$maxAttempts;
+} while ($maxAttempts > 0);
+
+if ($maxAttempts <= 0 || $mysql === null) {
+    fwrite($stderr, "\n" . 'Unable to contact your database');
+    if ($mysql !== null) {
+        fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
+        $mysql->close();
+    }
+    exit(1);
+}
+
 fwrite($stderr, "\n" . 'Database ready.');
 
-if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($database) . '` CHARACTER SET ' . $collation[0] . ' COLLATE ' . $collation[1])) {
+$createDatabase = $mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($database) . '` CHARACTER SET ' . $collation[0] . ' COLLATE ' . $collation[1]);
+if ($createDatabase === false) {
     fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
     $mysql->close();
-    exit(1);
+    exit(2);
 }
 
 $mysql->close();

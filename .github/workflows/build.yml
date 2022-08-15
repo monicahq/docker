@@ -1,6 +1,8 @@
 name: Monica's docker
 
 on:
+  push:
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
   release:

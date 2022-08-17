@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine
+FROM php:8.1-fpm-alpine
 
 # opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
@@ -48,8 +48,8 @@ RUN set -ex; \
     ; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.21; \
-    pecl install memcached-3.1.5; \
-    pecl install redis-5.3.6; \
+    pecl install memcached-3.2.0RC2; \
+    pecl install redis-5.3.7; \
     \
     docker-php-ext-enable \
         apcu \
@@ -102,9 +102,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v3.6.1
-LABEL org.opencontainers.image.revision="832b425502ad9d6059cabb9a70dd5351eb47fa81" \
-      org.opencontainers.image.version="v3.6.1"
+ENV MONICA_VERSION v3.7.0
+LABEL org.opencontainers.image.revision="a07317f309f25772925436346b4ebb23b6e69b43" \
+      org.opencontainers.image.version="v3.7.0"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \

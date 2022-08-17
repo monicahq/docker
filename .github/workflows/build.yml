@@ -1,6 +1,8 @@
 name: Monica's docker
 
 on:
+  push:
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
   release:
@@ -17,8 +19,8 @@ jobs:
         arch: [amd64, i386]
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
       with:
         repository: 'docker-library/official-images'
         path: 'official-images'
@@ -31,12 +33,12 @@ jobs:
     - name: Update base image
       if: matrix.arch == 'i386'
       run: |
-        docker pull i386/php:7.4-${{ matrix.variant }}
+        docker pull i386/php:8.1-${{ matrix.variant }}
 
     - name: Update base image
       if: matrix.arch != 'i386'
       run: |
-        docker pull php:7.4-${{ matrix.variant }}
+        docker pull php:8.1-${{ matrix.variant }}
 
     - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
       run: |
@@ -49,7 +51,7 @@ jobs:
         official-images/test/run.sh monica:${{ matrix.variant }}
 
     - name: Publish package
-      if: github.ref == 'refs/heads/master' && matrix.arch != 'i386'
+      if: github.ref == 'refs/heads/main' && matrix.arch != 'i386'
       run: |
         echo "$password" | docker login ghcr.io -u $username --password-stdin
         docker tag monica:${{ matrix.variant }} ghcr.io/monicahq/monica-dev:${{ matrix.variant }}
@@ -61,7 +63,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Test update script
       run: |
         hash_before=$(git write-tree)

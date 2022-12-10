@@ -77,6 +77,20 @@ docker run -d \
  -p 8080:80 \
  monica
 ```
+
+If you want to use a mysql installation that already exists, you can pass the database environment variables directly into the `docker run` command, with `DB_HOST` indicating the IP address of the MySQL database. Ensure all permissions are granted to the user specified in the enviornment variable `DB_USERNAME`.
+
+```console
+docker run -d \
+ -e DB_PORT=3306 \
+ -e DB_DATABASE=monica \
+ -e DB_USERNAME=homestead \
+ -e DB_PASSWORD=secret \
+ -e DB_HOST=0.0.0.0 \
+ -p 8080:80 \
+ monica
+```
+
 Wait until all migrations are done and then access Monica at http://localhost:8080/ from your host system.
 If this looks ok, add your first user account.
 

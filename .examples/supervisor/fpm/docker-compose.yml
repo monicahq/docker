@@ -1,4 +1,19 @@
-version: "3.4"
+# Run Monica with a supervisor process
+#
+# You might want to set these variables in you .env file:
+#
+#- APP_ENV=production
+#- APP_URL with your domain (https scheme)
+#- APP_KEY with a random string
+#
+#- DB_HOST=db
+# See `db` container for these values:
+#- DB_DATABASE=monica
+#- DB_USERNAME=monica
+#- DB_PASSWORD=secret
+#
+
+version: "3.9"
 
 services:
   app:
@@ -7,10 +22,6 @@ services:
     depends_on:
       - db
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always

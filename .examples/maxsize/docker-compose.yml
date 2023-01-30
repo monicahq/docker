@@ -1,17 +1,32 @@
-version: "3.4"
+# Run Monica with nginx proxy with client_max_body_size
+#
+# You might want to set these variables in you .env file:
+#
+#- APP_ENV=production
+#- APP_URL with your domain (https scheme)
+#- DEFAULT_MAX_UPLOAD_SIZE=500000
+#
+#- DB_HOST=db
+# See `db` container for these values:
+#- DB_DATABASE=monica
+#- DB_USERNAME=monica
+#- DB_PASSWORD=secret
+#
+# To use redis:
+#- REDIS_HOST=redis
+#- CACHE_DRIVER=redis
+#- QUEUE_CONNECTION=redis
+#
+
+version: "3.9"
 
 services:
   app:
     build: ./app
     image: monica-app
+    env_file: .env
     depends_on:
       - db
-    env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
-      - DEFAULT_MAX_UPLOAD_SIZE=500000
     volumes:
       - data:/var/www/html/storage
     restart: always

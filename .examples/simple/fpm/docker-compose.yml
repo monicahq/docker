@@ -1,4 +1,6 @@
-version: "3.4"
+# Run Monica with fpm+nginx backend
+
+version: "3.9"
 
 services:
   app:
@@ -6,9 +8,15 @@ services:
     depends_on:
       - db
     environment:
+      - APP_ENV=production
       - DB_HOST=db
+      - DB_DATABASE=monica
       - DB_USERNAME=monica
       - DB_PASSWORD=secret
+      - LOG_CHANNEL=stderr
+      - CACHE_DRIVER=database
+      - SESSION_DRIVER=database
+      - QUEUE_DRIVER=sync
     volumes:
       - data:/var/www/html/storage
     restart: always

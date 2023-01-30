@@ -4,11 +4,12 @@
 #
 #- APP_ENV=production
 #- APP_URL with your domain (https scheme)
+#- APP_KEY with a random string
 #- APP_TRUSTED_PROXIES=*
-
+#
 # If you're not using default 443 port for https, set APP_URL and:
 #- APP_FORCE_URL=true
-
+#
 #- DB_HOST=db
 # See `db` container for these values:
 #- DB_DATABASE=monica

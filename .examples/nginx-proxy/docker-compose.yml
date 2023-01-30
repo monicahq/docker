@@ -4,6 +4,7 @@
 #
 #- APP_ENV=production
 #- APP_URL with your domain (https scheme)
+#- APP_KEY with a random string
 #
 #- DB_HOST=db
 # See `db` container for these values:

@@ -4,11 +4,12 @@
 #
 #- APP_ENV=production
 #- APP_URL with your domain (https scheme)
+#- APP_KEY with a random string
 #- APP_TRUSTED_PROXIES=*
-
+#
 # If you're not using default 443 port for https, set APP_URL and:
 #- APP_FORCE_URL=true
-
+#
 #- DB_HOST=db
 # See `db` container for these values:
 #- DB_DATABASE=monica
@@ -21,18 +22,13 @@
 #- QUEUE_DRIVER=redis
 #
 
-version: "3.4"
+version: "3.9"
 
 services:
   app:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
-      - APP_TRUSTED_PROXIES=*
     volumes:
       - data:/var/www/html/storage
     restart: always
@@ -59,10 +55,6 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage
@@ -75,10 +67,6 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage

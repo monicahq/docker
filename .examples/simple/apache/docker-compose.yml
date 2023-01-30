@@ -1,4 +1,6 @@
-version: "3.4"
+# Run Monica with apache backend
+
+version: "3.9"
 
 services:
   app:
@@ -8,15 +10,21 @@ services:
     ports:
       - 80:80
     environment:
+      - APP_ENV=production
       - DB_HOST=db
+      - DB_DATABASE=monica
       - DB_USERNAME=monica
       - DB_PASSWORD=secret
+      - LOG_CHANNEL=stderr
+      - CACHE_DRIVER=database
+      - SESSION_DRIVER=database
+      - QUEUE_DRIVER=sync
     volumes:
       - data:/var/www/html/storage
     restart: always
 
   db:
-    image: mysql:5.7
+    image: mysql:8.0
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica

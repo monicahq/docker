@@ -1,9 +1,10 @@
-# Run Monica with Let's Encrypt certificate
+# Run Monica with nginx proxy
 #
 # You might want to set these variables in you .env file:
 #
 #- APP_ENV=production
 #- APP_URL with your domain (https scheme)
+#- APP_KEY with a random string
 #
 #- DB_HOST=db
 # See `db` container for these values:
@@ -17,17 +18,13 @@
 #- QUEUE_CONNECTION=redis
 #
 
-version: "3.4"
+version: "3.9"
 
 services:
   app:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     volumes:
       - data:/var/www/html/storage
     restart: always
@@ -54,10 +51,6 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage
@@ -70,10 +63,6 @@ services:
     build: ./app
     image: monica-app
     env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USERNAME=monica
-      - DB_PASSWORD=secret
     restart: always
     volumes:
       - data:/var/www/html/storage

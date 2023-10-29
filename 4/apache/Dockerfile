@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.1-apache
 
 # opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
@@ -29,11 +29,13 @@ RUN set -ex; \
         zlib1g-dev \
         libzip-dev \
         libpng-dev \
+        libpq-dev \
         libxml2-dev \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libgmp-dev \
         libmemcached-dev \
+        libmagickwand-dev \
         libwebp-dev \
     ; \
     \
@@ -50,13 +52,14 @@ RUN set -ex; \
         gmp \
         pdo_mysql \
         mysqli \
+        pdo_pgsql \
         soap \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.22; \
     pecl install memcached-3.2.0RC2; \
-    pecl install redis-5.3.7; \
+    pecl install redis-6.0.2; \
     \
     docker-php-ext-enable \
         apcu \
@@ -67,14 +70,14 @@ RUN set -ex; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
     apt-mark auto '.*' > /dev/null; \
     apt-mark manual $savedAptMark; \
-        ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-        | awk '/=>/ { print $3 }' \
+    ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+        | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
         | sort -u \
         | xargs -r dpkg-query -S \
         | cut -d: -f1 \
         | sort -u \
         | xargs -rt apt-mark manual; \
-        \
+    \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
@@ -90,6 +93,9 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="20000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+# Limits
+ENV PHP_MEMORY_LIMIT="512M" \
+    PHP_UPLOAD_LIMIT="512M"
 RUN set -ex; \
     \
     docker-php-ext-enable opcache; \
@@ -107,9 +113,36 @@ RUN set -ex; \
     \
     echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
     \
-    echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+    { \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+    } > $PHP_INI_DIR/conf.d/limits.ini;
 
+RUN set -ex; \
+    \
+    a2enmod headers rewrite remoteip; \
+    { \
+        echo RemoteIPHeader X-Real-IP; \
+        echo RemoteIPTrustedProxy 10.0.0.0/8; \
+        echo RemoteIPTrustedProxy 172.16.0.0/12; \
+        echo RemoteIPTrustedProxy 192.168.0.0/16; \
+    } > $APACHE_CONFDIR/conf-available/remoteip.conf; \
+    a2enconf remoteip
 
+# set apache config LimitRequestBody
+ENV APACHE_BODY_LIMIT 1073741824
+RUN set -ex; \
+    \
+    { \
+        echo 'LimitRequestBody ${APACHE_BODY_LIMIT}'; \
+    } > $APACHE_CONFDIR/conf-available/apache-limits.conf; \
+    a2enconf apache-limits
+
+RUN set -ex; \
+    APACHE_DOCUMENT_ROOT=/var/www/html/public; \
+    sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" $APACHE_CONFDIR/sites-available/*.conf; \
+    sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" $APACHE_CONFDIR/apache2.conf $APACHE_CONFDIR/conf-available/*.conf
 
 WORKDIR /var/www/html
 
@@ -121,6 +154,7 @@ LABEL org.opencontainers.image.revision="e1a3e1315b1a92a5ff0ccab6c22ba9ded77a599
 RUN set -ex; \
     fetchDeps=" \
         gnupg \
+        dirmngr \
     "; \
     apt-get update; \
     apt-get install -y --no-install-recommends $fetchDeps; \
@@ -131,7 +165,7 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPGKEY"; \
+    gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \
@@ -151,4 +185,4 @@ COPY entrypoint.sh \
     /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["php-fpm"]
+CMD ["apache2-foreground"]

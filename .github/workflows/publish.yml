@@ -3,6 +3,10 @@ name: Publish official image
 on:
   workflow_dispatch:
 
+env:
+  bashbrew-version: 0.1.9
+
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -10,11 +14,11 @@ jobs:
     environment: docker-official
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: monica-docker
           persist-credentials: false
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: docker-library/official-images
           fetch-depth: 0
@@ -24,7 +28,7 @@ jobs:
       - name: Install bashbrew
         working-directory: monica-docker
         run: |
-          curl -fsSL -o bashbrew https://github.com/docker-library/bashbrew/releases/download/v0.1.3/bashbrew-amd64
+          curl -fsSL -o bashbrew https://github.com/docker-library/bashbrew/releases/download/v${{ env.bashbrew-version }}/bashbrew-amd64
           chmod +x "bashbrew"
 
       - name: Run stackbrew

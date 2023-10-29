@@ -1,0 +1,8 @@
+COPY --chown=www-data:www-data env.production .env
+COPY entrypoint.sh \
+    queue.sh \
+    cron.sh \
+    /usr/local/bin/
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["%%CMD%%"]

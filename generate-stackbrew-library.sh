@@ -98,6 +98,6 @@ for release in "${releases[@]}"; do
 		EOE
 	done
 
-	popd
+	popd > /dev/null
 
 done

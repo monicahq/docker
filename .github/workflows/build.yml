@@ -21,6 +21,7 @@ jobs:
       matrix:
         variant: [apache, fpm, fpm-alpine]
         arch: [amd64, i386]
+        release: [4, 5]
         include:
           - release: 4
             php-version: 8.1

@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm-alpine
 
 # opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
@@ -11,38 +11,33 @@ LABEL org.opencontainers.image.authors="Alexis Saettler <alexis@saettler.org>" \
 # entrypoint.sh dependencies
 RUN set -ex; \
     \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
+    apk add --no-cache \
         bash \
-        busybox-static \
-    ; \
-    rm -rf /var/lib/apt/lists/*
+        coreutils
 
 # Install required PHP extensions
 RUN set -ex; \
     \
-    savedAptMark="$(apt-mark showmanual)"; \
-    \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        libicu-dev \
-        zlib1g-dev \
+    apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        icu-dev \
+        zlib-dev \
         libzip-dev \
-        libpng-dev \
         libxml2-dev \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libgmp-dev \
+        freetype-dev \
+        libpng-dev \
+        libpq-dev \
+        libjpeg-turbo-dev \
+        jpeg-dev \
+        gmp-dev \
         libmemcached-dev \
         libwebp-dev \
     ; \
     \
-    debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-    if [ ! -e /usr/include/gmp.h ]; then ln -s /usr/include/$debMultiarch/gmp.h /usr/include/gmp.h; fi;\
     docker-php-ext-configure intl; \
     docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp; \
     docker-php-ext-configure gmp; \
-    docker-php-ext-install -j$(nproc) \
+    docker-php-ext-install -j "$(nproc)" \
         intl \
         zip \
         bcmath \
@@ -50,13 +45,13 @@ RUN set -ex; \
         gmp \
         pdo_mysql \
         mysqli \
+        pdo_pgsql \
         soap \
     ; \
-    \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.22; \
     pecl install memcached-3.2.0RC2; \
-    pecl install redis-5.3.7; \
+    pecl install redis-6.0.2; \
     \
     docker-php-ext-enable \
         apcu \
@@ -64,32 +59,30 @@ RUN set -ex; \
         redis \
     ; \
     \
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-    apt-mark auto '.*' > /dev/null; \
-    apt-mark manual $savedAptMark; \
-        ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-        | awk '/=>/ { print $3 }' \
+    runDeps="$( \
+        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+        | tr ',' '\n' \
         | sort -u \
-        | xargs -r dpkg-query -S \
-        | cut -d: -f1 \
-        | sort -u \
-        | xargs -rt apt-mark manual; \
-        \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-    rm -rf /var/lib/apt/lists/*
+        | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+        )"; \
+    apk add --no-network --virtual .monica-phpext-rundeps $runDeps; \
+    apk del --no-network .build-deps
 
 # Set crontab for schedules
 RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
     rm -f /var/spool/cron/crontabs/root; \
-    echo '*/5 * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
+    echo '* * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
 
 # Opcache
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="20000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+# Limits
+ENV PHP_MEMORY_LIMIT="512M" \
+    PHP_UPLOAD_LIMIT="512M"
 RUN set -ex; \
     \
     docker-php-ext-enable opcache; \
@@ -107,23 +100,26 @@ RUN set -ex; \
     \
     echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
     \
-    echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+    { \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+    } > $PHP_INI_DIR/conf.d/limits.ini;
 
 
 
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v4.0.0
-LABEL org.opencontainers.image.revision="e1a3e1315b1a92a5ff0ccab6c22ba9ded77a599e" \
-      org.opencontainers.image.version="v4.0.0"
+ENV MONICA_VERSION v5.0.0-beta.3
+LABEL org.opencontainers.image.revision="452f59f58cb65097968eb9a6153d7be191fce08d" \
+      org.opencontainers.image.version="v5.0.0-beta.3"
 
 RUN set -ex; \
-    fetchDeps=" \
+    apk add --no-cache --virtual .fetch-deps \
+        bzip2 \
         gnupg \
-    "; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends $fetchDeps; \
+    ; \
     \
     for ext in tar.bz2 tar.bz2.asc; do \
         curl -fsSL -o monica-${MONICA_VERSION}.$ext "https://github.com/monicahq/monica/releases/download/${MONICA_VERSION}/monica-${MONICA_VERSION}.$ext"; \
@@ -131,7 +127,7 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPGKEY"; \
+    gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \
@@ -142,13 +138,13 @@ RUN set -ex; \
     cp /var/www/html/.env.example /var/www/html/.env; \
     chown -R www-data:www-data /var/www/html; \
     \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps; \
-    rm -rf /var/lib/apt/lists/*
+    apk del .fetch-deps
 
+COPY --chown=www-data:www-data env.production .env
 COPY entrypoint.sh \
     queue.sh \
     cron.sh \
     /usr/local/bin/
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]

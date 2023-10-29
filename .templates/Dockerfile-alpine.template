@@ -18,6 +18,7 @@ RUN set -ex; \
         libxml2-dev \
         freetype-dev \
         libpng-dev \
+        libpq-dev \
         libjpeg-turbo-dev \
         jpeg-dev \
         gmp-dev \
@@ -36,6 +37,7 @@ RUN set -ex; \
         gmp \
         pdo_mysql \
         mysqli \
+        pdo_pgsql \
         soap \
     ; \
 # pecl will claim success even if one install fails, so we need to perform each install separately

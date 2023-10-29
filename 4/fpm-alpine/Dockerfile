@@ -26,6 +26,7 @@ RUN set -ex; \
         libxml2-dev \
         freetype-dev \
         libpng-dev \
+        libpq-dev \
         libjpeg-turbo-dev \
         jpeg-dev \
         gmp-dev \
@@ -44,12 +45,13 @@ RUN set -ex; \
         gmp \
         pdo_mysql \
         mysqli \
+        pdo_pgsql \
         soap \
     ; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.22; \
     pecl install memcached-3.2.0RC2; \
-    pecl install redis-5.3.7; \
+    pecl install redis-6.0.2; \
     \
     docker-php-ext-enable \
         apcu \
@@ -71,13 +73,16 @@ RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
     rm -f /var/spool/cron/crontabs/root; \
-    echo '*/5 * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
+    echo '* * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
 
 # Opcache
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="20000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+# Limits
+ENV PHP_MEMORY_LIMIT="512M" \
+    PHP_UPLOAD_LIMIT="512M"
 RUN set -ex; \
     \
     docker-php-ext-enable opcache; \
@@ -95,7 +100,11 @@ RUN set -ex; \
     \
     echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
     \
-    echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+    { \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+    } > $PHP_INI_DIR/conf.d/limits.ini;
 
 
 
@@ -118,7 +127,7 @@ RUN set -ex; \
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPGKEY"; \
+    gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \

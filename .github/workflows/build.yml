@@ -8,54 +8,66 @@ on:
   release:
     types: [created]
 
+
+env:
+  bashbrew-version: 0.1.9
+
 jobs:
   build:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.release }}-${{ matrix.variant }} (${{ matrix.arch }})
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ubuntu-latest]
         variant: [apache, fpm, fpm-alpine]
         arch: [amd64, i386]
+        release: [4, 5]
+        include:
+          - release: 4
+            php-version: 8.1
+          - release: 5
+            php-version: 8.2
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       with:
-        repository: 'docker-library/official-images'
-        path: 'official-images'
+        # repository: docker-library/official-images
+        repository: asbiin/official-images
+        path: official-images
+        ref: monica-tests
 
     - name: Fix image
       if: matrix.arch == 'i386'
       run: |
-        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
+        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.release }}/${{ matrix.variant }}/Dockerfile"
 
     - name: Update base image
       if: matrix.arch == 'i386'
       run: |
-        docker pull i386/php:8.1-${{ matrix.variant }}
+        docker pull i386/php:${{ matrix.php-version }}-${{ matrix.variant }}
 
     - name: Update base image
       if: matrix.arch != 'i386'
       run: |
-        docker pull php:8.1-${{ matrix.variant }}
+        docker pull php:${{ matrix.php-version }}-${{ matrix.variant }}
 
-    - name: Build image ${{ matrix.variant }} ${{ matrix.arch }}
+    - name: Build image ${{ matrix.release }}-${{ matrix.variant }} ${{ matrix.arch }}
       run: |
-        docker build ${{ matrix.variant }} -t monica:${{ matrix.variant }}
+        docker build ${{ matrix.release }}/${{ matrix.variant }} -t monica:${{ matrix.release }}-${{ matrix.variant }}
         docker images
 
-    - name: Test image ${{ matrix.variant }} ${{ matrix.arch }}
+    - name: Test image ${{ matrix.release }}-${{ matrix.variant }} ${{ matrix.arch }}
       if: matrix.arch != 'i386' || matrix.variant != 'apache'
       run: |
-        official-images/test/run.sh monica:${{ matrix.variant }}
+        official-images/test/run.sh monica:${{ matrix.release }}-${{ matrix.variant }}
 
     - name: Publish package
       if: github.ref == 'refs/heads/main' && matrix.arch != 'i386'
       run: |
         echo "$password" | docker login ghcr.io -u $username --password-stdin
-        docker tag monica:${{ matrix.variant }} ghcr.io/monicahq/monica-dev:${{ matrix.variant }}
-        docker push ghcr.io/monicahq/monica-dev:${{ matrix.variant }}
+        docker tag monica:${{ matrix.release }}-${{ matrix.variant }} ghcr.io/monicahq/monica-dev:${{ matrix.release }}-${{ matrix.variant }}
+        docker push ghcr.io/monicahq/monica-dev:${{ matrix.release }}-${{ matrix.variant }}
       env:
         username: ${{ secrets.CR_USER }}
         password: ${{ secrets.CR_PAT }}
@@ -63,7 +75,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Test update script
       run: |
         hash_before=$(git write-tree)
@@ -72,7 +84,7 @@ jobs:
 
     - name: Install bashbrew
       run: |
-        curl -fsSL -o bashbrew https://github.com/docker-library/bashbrew/releases/download/v0.1.3/bashbrew-amd64
+        curl -fsSL -o bashbrew https://github.com/docker-library/bashbrew/releases/download/v${{ env.bashbrew-version }}/bashbrew-amd64
         chmod +x "bashbrew"
     - name: Run stackbrew
       run: |

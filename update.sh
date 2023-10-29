@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-version=$1
 IFS='
 '
 
@@ -9,8 +8,21 @@ _template() {
     sed -e 's/\\/\\\\/g' $1 | sed -E ':a;N;$!ba;s/\r{0,1}\n/%0A/g'
 }
 
+releases=(
+    4
+    5
+)
+
+variants=(
+    apache
+    fpm
+    fpm-alpine
+)
+
 declare -A php_version=(
-    [default]='8.1'
+    [default]='8.2'
+    [5]='8.2'
+    [4]='8.1'
 )
 
 declare -A cmd=(
@@ -79,46 +91,56 @@ _githubapi() {
     fi
 }
 
-if [ -z "$version" ]; then
-  version="$(_githubapi 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' || _githubapi 'https://api.github.com/repos/monicahq/monica/releases' | jq -r '.[0].tag_name')"
-fi
-echo "  Monica version: $version"
-commit="$(_githubapi 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
-echo "  Commit: $commit"
-
 head=$(_template .templates/Dockerfile-head.template)
-foot=$(_template .templates/Dockerfile-foot.template)
 extra=$(_template .templates/Dockerfile-extra.template)
 install=$(_template .templates/Dockerfile-install.template)
 
-for variant in apache fpm fpm-alpine; do
-	echo Generating $variant variant...
-    rm -rf $variant
-    mkdir -p $variant
-    phpVersion=${php_version[$version]-${php_version[default]}}
+if [ -n "${1:-}" ]; then
+	releases=( "$1" )
+fi
+if [ -n "${2:-}" ]; then
+	variants=( "$2" )
+fi
 
-    template="Dockerfile-${base[$variant]}.template"
+for release in "${releases[@]}"; do
 
-    sed -e '
-        s@%%HEAD%%@'"$head"'@;
-        s@%%FOOT%%@'"$foot"'@;
-        s@%%EXTRA_INSTALL%%@'"$extra"'@;
-        s@%%INSTALL%%@'"$install"'@;
-        s/%%VARIANT%%/'"$variant"'/;
-        s/%%PHP_VERSION%%/'"$phpVersion"'/;
-        s#%%LABEL%%#'"$label"'#;
-        s/%%VERSION%%/'"$version"'/g;
-        s/%%COMMIT%%/'"$commit"'/;
-        s/%%CMD%%/'"${cmd[$variant]}"'/;
-        s#%%APACHE_DOCUMENT%%#'"${document[$variant]}"'#;
-        s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;
-        s/%%MEMCACHED_VERSION%%/'"${pecl_versions[memcached]}"'/;
-        s/%%REDIS_VERSION%%/'"${pecl_versions[redis]}"'/;
-    ' \
-        -e "s/%0A/\n/g;" \
-        $template > "$variant/Dockerfile"
-    
-    for file in entrypoint cron queue; do
-        cp docker-$file.sh $variant/$file.sh
+    echo "Processing release $release"
+
+    version="$(_githubapi 'https://api.github.com/repos/monicahq/monica/releases' | jq -r 'map(select(.tag_name | startswith ("v'$release'"))) | .[0].tag_name')"
+
+    echo "  Monica version: $version"
+    commit="$(_githubapi 'https://api.github.com/repos/monicahq/monica/tags' | jq -r 'map(select(.name | contains ("'$version'"))) | .[].commit.sha')"
+    echo "  Commit: $commit"
+
+    foot=$(_template .templates/Dockerfile-foot$release.template)
+
+    for variant in "${variants[@]}"; do
+        echo Generating $variant variant...
+        rm -rf $release/$variant
+        mkdir -p $release/$variant
+        phpVersion=${php_version[$release]-${php_version[default]}}
+
+        template=".templates/Dockerfile-${base[$variant]}.template"
+
+        sed -e '
+            s@%%HEAD%%@'"$head"'@;
+            s@%%FOOT%%@'"$foot"'@;
+            s@%%EXTRA_INSTALL%%@'"$extra"'@;
+            s@%%INSTALL%%@'"$install"'@;
+            s/%%VARIANT%%/'"$variant"'/;
+            s/%%PHP_VERSION%%/'"$phpVersion"'/;
+            s#%%LABEL%%#'"$label"'#;
+            s/%%VERSION%%/'"$version"'/g;
+            s/%%COMMIT%%/'"$commit"'/;
+            s/%%CMD%%/'"${cmd[$variant]}"'/;
+            s@%%APACHE_DOCUMENT%%@'"${document[$variant]}"'@;
+            s/%%APCU_VERSION%%/'"${pecl_versions[APCu]}"'/;
+            s/%%MEMCACHED_VERSION%%/'"${pecl_versions[memcached]}"'/;
+            s/%%REDIS_VERSION%%/'"${pecl_versions[redis]}"'/;
+        ' \
+            -e "s/%0A/\n/g;" \
+            $template > "$release/$variant/Dockerfile"
+        
+        cp .templates/scripts/$release/* $release/$variant/
     done
 done

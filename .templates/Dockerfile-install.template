@@ -4,7 +4,7 @@
     \
     GPGKEY='BDAB0D0D36A00466A2964E85DE15667131EA6018'; \
     export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPGKEY"; \
+    gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$GPGKEY"; \
     gpg --batch --verify monica-${MONICA_VERSION}.tar.bz2.asc monica-${MONICA_VERSION}.tar.bz2; \
     \
     tar -xf monica-${MONICA_VERSION}.tar.bz2 -C /var/www/html --strip-components=1; \

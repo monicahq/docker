@@ -3,13 +3,16 @@ RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
     rm -f /var/spool/cron/crontabs/root; \
-    echo '*/5 * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
+    echo '* * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
 
 # Opcache
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="20000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+# Limits
+ENV PHP_MEMORY_LIMIT="512M" \
+    PHP_UPLOAD_LIMIT="512M"
 RUN set -ex; \
     \
     docker-php-ext-enable opcache; \
@@ -27,7 +30,11 @@ RUN set -ex; \
     \
     echo 'apc.enable_cli=1' >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini; \
     \
-    echo 'memory_limit=512M' > $PHP_INI_DIR/conf.d/memory-limit.ini
+    { \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+    } > $PHP_INI_DIR/conf.d/limits.ini;
 
 %%APACHE_DOCUMENT%%
 

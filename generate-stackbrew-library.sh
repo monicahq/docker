@@ -60,33 +60,45 @@ join() {
 SEARCHFOR="Upgrade available - the latest version is "
 latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/latest' | jq -r '.tag_name' | cut -c 2-)"
 
-variants=( */ )
-variants=( "${variants[@]%/}" )
+# releases=( */ )
+# releases=( "${releases[@]%/}" )
+releases=( 4 )
 
-for variant in "${variants[@]}"; do
-	commit="$(dockerfileCommit "$variant")"
-	fullversion="$(git show "$commit":"$variant/Dockerfile" | grep -iF "ENV MONICA_VERSION" | sed -E "s@ENV MONICA_VERSION v([0-9.]+)@\1@")"
+for release in "${releases[@]}"; do
 
-	versionAliases=( "$fullversion" "${fullversion%.*}" "${fullversion%.*.*}" )
-	if [ "$fullversion" = "$latest" ]; then
-		versionAliases+=( "latest" )
-	fi
+	pushd "$release" > /dev/null
 
-	variantAliases=( "${versionAliases[@]/%/-$variant}" )
-	variantAliases=( "${variantAliases[@]//latest-}" )
+	variants=( */ )
+	variants=( "${variants[@]%/}" )
 
-	if [ "$variant" = "$defaultVariant" ]; then
-		variantAliases+=( "${versionAliases[@]}" )
-	fi
+	for variant in "${variants[@]}"; do
+		commit="$(dockerfileCommit "$variant")"
+		fullversion="$(cat "$variant/Dockerfile" | grep -iF "ENV MONICA_VERSION" | sed -E "s@ENV MONICA_VERSION v([0-9.]+)@\1@")"
 
-	variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$variant/Dockerfile")"
-	variantArches="${parentRepoToArches[$variantParent]}"
+		versionAliases=( "$fullversion" "${fullversion%.*}" "${fullversion%.*.*}" )
+		if [ "$fullversion" = "$latest" ]; then
+			versionAliases+=( "latest" )
+		fi
 
-	cat <<-EOE
+		variantAliases=( "${versionAliases[@]/%/-$variant}" )
+		variantAliases=( "${variantAliases[@]//latest-}" )
 
-		Tags: $(join ', ' "${variantAliases[@]}")
-		Architectures: $(join ', ' $variantArches)
-		Directory: $variant
-		GitCommit: $commit
-	EOE
+		if [ "$fullversion" = "$latest" -a "$variant" = "$defaultVariant" ]; then
+			variantAliases+=( "${versionAliases[@]}" )
+		fi
+
+		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$variant/Dockerfile")"
+		variantArches="${parentRepoToArches[$variantParent]}"
+
+		cat <<-EOE
+
+			Tags: $(join ', ' "${variantAliases[@]}")
+			Architectures: $(join ', ' $variantArches)
+			Directory: $release/$variant
+			GitCommit: $commit
+		EOE
+	done
+
+	popd > /dev/null
+
 done

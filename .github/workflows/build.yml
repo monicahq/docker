@@ -14,11 +14,11 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.release }}-${{ matrix.variant }} (${{ matrix.arch }})
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ubuntu-latest]
         variant: [apache, fpm, fpm-alpine]
         arch: [amd64, i386]
         include:
@@ -37,7 +37,7 @@ jobs:
     - name: Fix image
       if: matrix.arch == 'i386'
       run: |
-        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.variant }}/Dockerfile"
+        sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.release }}/${{ matrix.variant }}/Dockerfile"
 
     - name: Update base image
       if: matrix.arch == 'i386'

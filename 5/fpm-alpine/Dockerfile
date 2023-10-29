@@ -73,7 +73,7 @@ RUN set -ex; \
     \
     mkdir -p /var/spool/cron/crontabs; \
     rm -f /var/spool/cron/crontabs/root; \
-    echo '*/5 * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
+    echo '* * * * * php /var/www/html/artisan schedule:run -v' > /var/spool/cron/crontabs/www-data
 
 # Opcache
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
@@ -111,9 +111,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v5.0.0-beta.2
-LABEL org.opencontainers.image.revision="560622420dab2a394b301ddba8ae896049c3f325" \
-      org.opencontainers.image.version="v5.0.0-beta.2"
+ENV MONICA_VERSION v5.0.0-beta.3
+LABEL org.opencontainers.image.revision="452f59f58cb65097968eb9a6153d7be191fce08d" \
+      org.opencontainers.image.version="v5.0.0-beta.3"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \

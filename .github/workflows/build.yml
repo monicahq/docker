@@ -22,17 +22,19 @@ jobs:
         variant: [apache, fpm, fpm-alpine]
         arch: [amd64, i386]
         include:
-          - release: '4'
-            php-version: '8.1'
-          - release: '5'
-            php-version: '8.2'
+          - release: 4
+            php-version: 8.1
+          - release: 5
+            php-version: 8.2
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/checkout@v4
       with:
-        repository: 'docker-library/official-images'
-        path: 'official-images'
+        # repository: docker-library/official-images
+        repository: asbiin/official-images
+        path: official-images
+        ref: monica-tests
 
     - name: Fix image
       if: matrix.arch == 'i386'

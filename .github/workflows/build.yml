@@ -43,14 +43,10 @@ jobs:
         sed -i -e 's/FROM php/FROM i386\/php/g' "${{ matrix.release }}/${{ matrix.variant }}/Dockerfile"
 
     - name: Update base image
-      if: matrix.arch == 'i386'
       run: |
-        docker pull i386/php:${{ matrix.php-version }}-${{ matrix.variant }}
-
-    - name: Update base image
-      if: matrix.arch != 'i386'
-      run: |
-        docker pull php:${{ matrix.php-version }}-${{ matrix.variant }}
+        docker pull ${{ env.prefix }}php:${{ matrix.php-version }}-${{ matrix.variant }}
+      env:
+        prefix: ${{ (matrix.arch == 'i386') && 'i386/' || '' }}
 
     - name: Build image ${{ matrix.release }}-${{ matrix.variant }} ${{ matrix.arch }}
       run: |

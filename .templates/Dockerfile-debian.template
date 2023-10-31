@@ -27,6 +27,8 @@ RUN set -ex; \
         libjpeg62-turbo-dev \
         libgmp-dev \
         libmemcached-dev \
+        libcurl4-openssl-dev \
+        libevent-dev \
         libmagickwand-dev \
         libwebp-dev \
     ; \

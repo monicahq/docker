@@ -23,6 +23,7 @@ RUN set -ex; \
         jpeg-dev \
         gmp-dev \
         libmemcached-dev \
+        libevent-dev \
         libwebp-dev \
     ; \
     \

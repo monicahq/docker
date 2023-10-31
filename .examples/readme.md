@@ -25,7 +25,7 @@ curl -sS https://raw.githubusercontent.com/monicahq/monica/main/.env.example -o 
 Open the file in an editor and update it for your own needs:
 
 - Set `APP_KEY` to a random 32-character string. You can for instance copy and paste the output of `echo -n 'base64:'; openssl rand -base64 32`.
-- Edit the `MAIL_*` settings to point to your own [mailserver](/docs/installation/mail.md).
+- Edit the `MAIL_*` settings to point to your own [mailserver](https://github.com/monicahq/monica/blob/4.x/docs/installation/mail.md).
 - Set `DB_*` settings to point to your database configuration. If you don't want to set a db prefix, be careful to set `DB_PREFIX=` and not `DB_PREFIX=''` as docker will not expand this as an empty string.
 - Set `DB_HOST=db` or any name of the database container you will link to.
 

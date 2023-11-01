@@ -33,7 +33,7 @@ services:
       - redis
 
   db:
-    image: mysql:5.7
+    image: mariadb:11
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
@@ -50,11 +50,11 @@ services:
   cron:
     build: ./app
     image: monica-app
+    command: cron.sh
     env_file: .env
     restart: always
     volumes:
       - data:/var/www/html/storage
-    command: cron.sh
     depends_on:
       - db
       - redis
@@ -62,11 +62,11 @@ services:
   queue:
     build: ./app
     image: monica-app
+    command: queue.sh
     env_file: .env
     restart: always
     volumes:
       - data:/var/www/html/storage
-    command: queue.sh
     depends_on:
       - db
       - redis

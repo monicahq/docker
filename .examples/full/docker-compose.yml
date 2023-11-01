@@ -1,0 +1,105 @@
+# Run Monica with fpm flavor, mariadb, cron, queue, redis, and nginx
+#
+# You first need to generate the secrets for the encryption key and db password:
+# `{ echo -n 'base64:'; openssl rand -base64 32; } | docker secret create app_key -`
+# `openssl rand -hex 24 | docker secret create mysql_password -`
+#
+# You might want to set these variables in you .env file:
+#- APP_URL with your domain (https scheme)
+#
+
+version: "3.9"
+
+services:
+  app:
+    build: ./app
+    image: monica-app
+    env_file: .env
+    environment:
+      - APP_KEY_FILE=/run/secrets/app_key
+      - DB_PASSWORD_FILE=/run/secrets/mysql_password
+    volumes:
+      - data:/var/www/html/storage
+    restart: always
+    depends_on:
+      - db
+      - redis
+    secrets:
+      - app_key
+      - mysql_password
+
+  db:
+    image: mariadb:11
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=monica
+      - MYSQL_USER=monica
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: always
+    secrets:
+      - mysql_password
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  cron:
+    build: ./app
+    image: monica-app
+    command: cron.sh
+    env_file: .env
+    environment:
+      - APP_KEY_FILE=/run/secrets/app_key
+      - DB_PASSWORD_FILE=/run/secrets/mysql_password
+    restart: always
+    volumes:
+      - data:/var/www/html/storage
+    depends_on:
+      - db
+      - redis
+    secrets:
+      - app_key
+      - mysql_password
+
+  queue:
+    build: ./app
+    image: monica-app
+    command: queue.sh
+    env_file: .env
+    environment:
+      - APP_KEY_FILE=/run/secrets/app_key
+      - DB_PASSWORD_FILE=/run/secrets/mysql_password
+    restart: always
+    volumes:
+      - data:/var/www/html/storage
+    depends_on:
+      - db
+      - redis
+    secrets:
+      - app_key
+      - mysql_password
+
+  web:
+    build: ./web
+    image: monica-web
+    restart: always
+    ports:
+      - 8081:80
+    volumes:
+      - data:/var/www/html/storage:ro
+    depends_on:
+      - app
+
+
+volumes:
+  data:
+  mysql:
+
+
+secrets:
+  app_key:
+    external: true
+  mysql_password:
+    external: true

@@ -5,6 +5,7 @@ In this section you will find some examples about how to use monica's docker ima
 | Example | Description |
 |---------|-------------|
 | [`simple`](simple) | simple example that run a container.
+| [`full`](full) | example that run `fpm-alpine` with nginx, redis, separate cron and queue containers, and uses secrets.
 | [`supervisor`](supervisor) | uses supervisor to run a cron and a queue inside your container.
 | [`nginx-proxy-self-signed-ssl`](nginx-proxy-self-signed-ssl) | shows you how to run monica with a self signed ssl certificate.
 | [`nginx-proxy`](nginx-proxy) | shows you how to run monica with https and generate a [Let's Encrypt](https://letsencrypt.org/) certificate.
@@ -19,7 +20,7 @@ In this section you will find some examples about how to use monica's docker ima
 First, download a copy of Monica example configuration file:
 
 ```sh
-curl -sS https://raw.githubusercontent.com/monicahq/monica/main/.env.example -o .env
+curl -sS https://raw.githubusercontent.com/monicahq/monica/4.x/.env.example -o .env
 ```
 
 Open the file in an editor and update it for your own needs:
@@ -33,7 +34,7 @@ Open the file in an editor and update it for your own needs:
 ### With supervisor
 
 The [`supervisor`](supervisor) examples shows you how to run monica with
-- a db container (mysql:5.7)
+- a db container (mariadb:11)
 - an app container, which run `supervisord` to handle a web server/fpm, a cron, and a queue.
 
 This let you use `QUEUE_CONNECTION=database` in your `.env` file.
@@ -61,6 +62,6 @@ Don't forget to set:
 You may want to set `APP_ENV=production` to force the use of `https` scheme.
 
 This example add a `redis` container, that can be used too, adding these variables to your `.env` file:
-- `REDIS_HOST=redis`: mandatory
+- `REDIS_HOST=redis`: mandatory, where `redis` is the name of the redis container
 - `CACHE_DRIVER=redis`: to use redis as a cache table
 - `QUEUE_CONNECTION=redis`: to use redis as a queue table

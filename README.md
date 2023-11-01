@@ -63,14 +63,14 @@ monica
 
 ### Connect to a mysql database
 
-Monica needs a database connection, and currently supports mysql only. Run these to have a running environment:
+Monica needs a database connection, and currently supports mysql/mariadb only. Run these to have a running environment:
 ```console
 mysqlCid="$(docker run -d \
  -e MYSQL_RANDOM_ROOT_PASSWORD=true \
  -e MYSQL_DATABASE=monica \
  -e MYSQL_USER=homestead \
  -e MYSQL_PASSWORD=secret \
- "mysql:5.7")"
+ "mariadb:11")"
 docker run -d \
  --link "$mysqlCid":mysql \
  -e DB_HOST=mysql \
@@ -146,7 +146,7 @@ services:
     restart: always
 
   db:
-    image: mysql:5.7
+    image: mariadb:11
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica
@@ -223,7 +223,7 @@ services:
     restart: always
 
   db:
-    image: mysql:5.7
+    image: mariadb:11
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica

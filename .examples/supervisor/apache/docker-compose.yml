@@ -29,7 +29,7 @@ services:
     restart: always
 
   db:
-    image: mysql:5.7
+    image: mariadb:11
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=monica

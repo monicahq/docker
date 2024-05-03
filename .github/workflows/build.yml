@@ -10,7 +10,7 @@ on:
 
 
 env:
-  bashbrew-version: 0.1.9
+  bashbrew-version: 0.1.12
 
 jobs:
   build:
@@ -24,9 +24,9 @@ jobs:
         release: [4, 5]
         include:
           - release: 4
-            php-version: 8.1
-          - release: 5
             php-version: 8.2
+          - release: 5
+            php-version: 8.3
 
     steps:
     - uses: actions/checkout@v4

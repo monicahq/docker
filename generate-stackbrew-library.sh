@@ -62,7 +62,7 @@ latest="$(curl -fsSL 'https://api.github.com/repos/monicahq/monica/releases/late
 
 # releases=( */ )
 # releases=( "${releases[@]%/}" )
-releases=( 4 )
+releases=( 4 5 )
 
 for release in "${releases[@]}"; do
 

@@ -20,9 +20,9 @@ variants=(
 )
 
 declare -A php_version=(
-    [default]='8.2'
-    [5]='8.2'
-    [4]='8.1'
+    [default]='8.3'
+    [5]='8.3'
+    [4]='8.2'
 )
 
 declare -A cmd=(

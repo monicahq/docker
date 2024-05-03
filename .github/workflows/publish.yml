@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  bashbrew-version: 0.1.9
+  bashbrew-version: 0.1.12
 
 
 jobs:

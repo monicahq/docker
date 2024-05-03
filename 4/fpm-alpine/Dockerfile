@@ -49,7 +49,7 @@ RUN set -ex; \
         soap \
     ; \
 # pecl will claim success even if one install fails, so we need to perform each install separately
-    pecl install APCu-5.1.22; \
+    pecl install APCu-5.1.23; \
     pecl install memcached-3.2.0; \
     pecl install redis-6.0.2; \
     \
@@ -111,9 +111,9 @@ RUN set -ex; \
 WORKDIR /var/www/html
 
 # Define Monica version
-ENV MONICA_VERSION v4.0.0
-LABEL org.opencontainers.image.revision="e1a3e1315b1a92a5ff0ccab6c22ba9ded77a599e" \
-      org.opencontainers.image.version="v4.0.0"
+ENV MONICA_VERSION v4.1.1
+LABEL org.opencontainers.image.revision="50c266f7beb9d8fe6cd8c8929a759529275143f4" \
+      org.opencontainers.image.version="v4.1.1"
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \

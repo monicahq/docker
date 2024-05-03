@@ -59,7 +59,7 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ]; then
     fi
 
     # Run migrations
-    ${ARTISAN} monica:waitfordb
+    ${ARTISAN} waitfordb
     ${ARTISAN} monica:setup --force -vv
 
 fi

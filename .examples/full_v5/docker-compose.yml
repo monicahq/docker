@@ -1,0 +1,110 @@
+# Run Monica with fpm flavor, mariadb, cron, queue, redis, and nginx
+#
+# You first need to generate the secrets for the encryption key and db password:
+# `{ echo -n 'base64:'; openssl rand -base64 32; } | docker secret create app_key -`
+# `openssl rand -hex 24 | docker secret create mysql_password -`
+#
+# You might want to set these variables in you .env file:
+#- APP_URL with your domain (https scheme)
+#
+
+services:
+  app: &app
+    build: ./app
+    image: monica-app
+    env_file: .env
+    environment:
+      - APP_KEY_FILE=/run/secrets/app_key
+      - DB_PASSWORD_FILE=/run/secrets/mysql_password
+      - MEILISEARCH_KEY=ChangeMe_ChangeMe
+    volumes:
+      - data:/var/www/html/storage
+    networks:
+      - monica
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - memcached
+      - meilisearch
+    secrets:
+      - app_key
+      - mysql_password
+
+  db:
+    image: mariadb:11
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=monica
+      - MYSQL_USER=monica
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - monica
+    restart: always
+    secrets:
+      - mysql_password
+
+  redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - monica
+
+  cron:
+    <<: *app
+    command: cron.sh
+
+  queue:
+    <<: *app
+    command: queue.sh
+
+  memcached:
+    image: memcached:alpine
+    networks:
+      - monica
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    environment:
+      - MEILI_MASTER_KEY=ChangeMe_ChangeMe
+      - MEILISEARCH_NO_ANALYTICS=true
+    volumes:
+      - meili_data:/meili_data
+    networks:
+      - monica
+
+  web:
+    build: ./web
+    image: monica-web
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - data:/var/www/html/storage:ro
+    networks:
+      - monica
+    depends_on:
+      - app
+
+
+networks:
+  monica:
+    driver: overlay
+
+
+volumes:
+  data:
+    driver: local
+  mysqldata:
+    driver: local
+  meili_data:
+    driver: local
+
+
+secrets:
+  app_key:
+    external: true
+  mysql_password:
+    external: true

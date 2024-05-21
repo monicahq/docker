@@ -42,8 +42,9 @@ services:
       - mysql:/var/lib/mysql
     restart: always
 
+
 volumes:
   data:
-    name: data
+    driver: local
   mysql:
-    name: mysql
+    driver: local

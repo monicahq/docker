@@ -21,7 +21,7 @@
 version: "3.9"
 
 services:
-  app:
+  app: &app
     build: ./app
     image: monica-app
     env_file: .env
@@ -40,7 +40,7 @@ services:
       - MYSQL_USER=monica
       - MYSQL_PASSWORD=secret
     volumes:
-      - mysql:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
     restart: always
 
   redis:
@@ -48,28 +48,12 @@ services:
     restart: always
 
   cron:
-    build: ./app
-    image: monica-app
+    <<: *app
     command: cron.sh
-    env_file: .env
-    restart: always
-    volumes:
-      - data:/var/www/html/storage
-    depends_on:
-      - db
-      - redis
 
   queue:
-    build: ./app
-    image: monica-app
+    <<: *app
     command: queue.sh
-    env_file: .env
-    restart: always
-    volumes:
-      - data:/var/www/html/storage
-    depends_on:
-      - db
-      - redis
 
   web:
     build: ./web
@@ -116,12 +100,20 @@ services:
     depends_on:
       - proxy
 
-volumes:
-  data:
-  mysql:
-  certs:
-  vhost.d:
-  html:
 
 networks:
   proxy-tier:
+    driver: bridge
+
+
+volumes:
+  data:
+    driver: local
+  mysqldata:
+    driver: local
+  certs:
+    driver: local
+  vhost.d:
+    driver: local
+  html:
+    driver: local

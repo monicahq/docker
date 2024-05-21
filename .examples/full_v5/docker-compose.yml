@@ -8,8 +8,6 @@
 #- APP_URL with your domain (https scheme)
 #
 
-version: "3.9"
-
 services:
   app: &app
     build: ./app
@@ -18,12 +16,17 @@ services:
     environment:
       - APP_KEY_FILE=/run/secrets/app_key
       - DB_PASSWORD_FILE=/run/secrets/mysql_password
+      - MEILISEARCH_KEY=ChangeMe_ChangeMe
     volumes:
       - data:/var/www/html/storage
+    networks:
+      - monica
     restart: always
     depends_on:
       - db
       - redis
+      - memcached
+      - meilisearch
     secrets:
       - app_key
       - mysql_password
@@ -37,6 +40,8 @@ services:
       - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
     volumes:
       - mysqldata:/var/lib/mysql
+    networks:
+      - monica
     restart: always
     secrets:
       - mysql_password
@@ -44,6 +49,8 @@ services:
   redis:
     image: redis:alpine
     restart: always
+    networks:
+      - monica
 
   cron:
     <<: *app
@@ -53,6 +60,21 @@ services:
     <<: *app
     command: queue.sh
 
+  memcached:
+    image: memcached:alpine
+    networks:
+      - monica
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    environment:
+      - MEILI_MASTER_KEY=ChangeMe_ChangeMe
+      - MEILISEARCH_NO_ANALYTICS=true
+    volumes:
+      - meili_data:/meili_data
+    networks:
+      - monica
+
   web:
     build: ./web
     image: monica-web
@@ -61,14 +83,23 @@ services:
       - 80:80
     volumes:
       - data:/var/www/html/storage:ro
+    networks:
+      - monica
     depends_on:
       - app
+
+
+networks:
+  monica:
+    driver: overlay
 
 
 volumes:
   data:
     driver: local
   mysqldata:
+    driver: local
+  meili_data:
     driver: local
 
 

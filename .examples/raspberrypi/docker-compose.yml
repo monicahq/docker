@@ -30,11 +30,12 @@ services:
       MYSQL_USER: homestead
       MYSQL_PASSWORD: secret
     volumes:
-      - mysql:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
     restart: always
+
 
 volumes:
   data:
-    name: data
-  mysql:
-    name: mysql
+    driver: local
+  mysqldata:
+    driver: local

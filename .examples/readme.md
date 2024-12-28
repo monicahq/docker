@@ -6,6 +6,7 @@ In this section you will find some examples about how to use monica's docker ima
 |---------|-------------|
 | [`simple`](simple) | simple example that run a container.
 | [`full`](full) | example that run `fpm-alpine` with nginx, redis, separate cron and queue containers, and uses secrets.
+| [`full_v5`](full_v5) | example for v5 of monica (a.k.a chandler) that run `fpm-alpine` with nginx, redis, separate cron and queue containers, and uses secrets.
 | [`supervisor`](supervisor) | uses supervisor to run a cron and a queue inside your container.
 | [`nginx-proxy-self-signed-ssl`](nginx-proxy-self-signed-ssl) | shows you how to run monica with a self signed ssl certificate.
 | [`nginx-proxy`](nginx-proxy) | shows you how to run monica with https and generate a [Let's Encrypt](https://letsencrypt.org/) certificate.

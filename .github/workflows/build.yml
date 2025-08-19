@@ -10,7 +10,7 @@ on:
 
 
 env:
-  bashbrew-version: 0.1.12
+  bashbrew-version: 0.1.13
 
 jobs:
   build:
@@ -32,10 +32,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/checkout@v4
       with:
-        # repository: docker-library/official-images
-        repository: asbiin/official-images
+        repository: docker-library/official-images
         path: official-images
-        ref: monica-tests
 
     - name: Fix image
       if: matrix.arch == 'i386'

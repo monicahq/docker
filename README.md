@@ -257,6 +257,15 @@ volumes:
    docker-compose exec app php artisan setup:production
    ```
 
+## Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and Monica has a one-click deployment template there:
+
+[![Deploy on Easypanel][easypanel-btn]][easypanel-deploy]
+
+[easypanel-btn]: https://easypanel.io/img/deploy-on-easypanel-40.svg
+[easypanel-deploy]: https://easypanel.io/templates/monica
+
 ## Make Monica available from the internet 
 
 To expose your Monica instance for the internet, it's important to set `APP_ENV=production` in your `.env` file or environment variables. In this case `https` scheme will be **mandatory**.
